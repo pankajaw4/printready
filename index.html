@@ -9,70 +9,111 @@
 
 <style>
 *{box-sizing:border-box}
+
 body{
- margin:0;
- font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
- background:#f5f7fb;
- color:#172033;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f5f7fb;
+  color:#172033;
 }
+
 header{
- background:#111827;
- color:white;
- padding:28px 20px;
- text-align:center;
+  background:#111827;
+  color:white;
+  padding:28px 20px;
+  text-align:center;
 }
-header h1{margin:0;font-size:30px}
-header p{margin:8px 0 0;color:#b9c1d0}
-main{max-width:650px;margin:auto;padding:20px}
+
+header h1{
+  margin:0;
+  font-size:30px;
+}
+
+header p{
+  margin:8px 0 0;
+  color:#b9c1d0;
+}
+
+main{
+  max-width:650px;
+  margin:auto;
+  padding:20px;
+}
+
 .card{
- background:white;
- border-radius:18px;
- padding:20px;
- margin-bottom:16px;
- box-shadow:0 5px 20px rgba(0,0,0,.06);
+  background:white;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 5px 20px rgba(0,0,0,.06);
 }
-h2{font-size:19px;margin-top:0}
+
+h2{
+  font-size:19px;
+  margin-top:0;
+}
+
 .upload{
- border:2px dashed #c8cfdb;
- border-radius:14px;
- padding:22px;
- text-align:center;
- margin:12px 0;
+  border:2px dashed #c8cfdb;
+  border-radius:14px;
+  padding:22px;
+  text-align:center;
+  margin:12px 0;
 }
-input{width:100%}
+
+input{
+  width:100%;
+  margin-top:10px;
+}
+
 .preview{
- display:none;
- width:100%;
- max-height:240px;
- object-fit:contain;
- margin-top:12px;
- border-radius:10px;
- background:#eee;
+  display:none;
+  width:100%;
+  max-height:240px;
+  object-fit:contain;
+  margin-top:12px;
+  border-radius:10px;
+  background:#eee;
 }
+
 button{
- width:100%;
- border:0;
- border-radius:12px;
- padding:15px;
- font-size:17px;
- font-weight:600;
- cursor:pointer;
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:15px;
+  font-size:17px;
+  font-weight:600;
+  cursor:pointer;
 }
-.primary{background:#2563eb;color:white}
-.secondary{background:#e9eef7;color:#172033;margin-top:10px}
-button:disabled{opacity:.45}
+
+.primary{
+  background:#2563eb;
+  color:white;
+}
+
+.secondary{
+  background:#e9eef7;
+  color:#172033;
+  margin-top:10px;
+}
+
+button:disabled{
+  opacity:.45;
+}
+
 .note{
- font-size:13px;
- color:#687386;
- line-height:1.5;
+  font-size:13px;
+  color:#687386;
+  line-height:1.5;
 }
+
 .success{
- display:none;
- background:#e9f9ef;
- color:#126b36;
- padding:13px;
- border-radius:10px;
- margin-top:12px;
+  display:none;
+  background:#e9f9ef;
+  color:#126b36;
+  padding:13px;
+  border-radius:10px;
+  margin-top:12px;
 }
 </style>
 </head>
@@ -80,58 +121,68 @@ button:disabled{opacity:.45}
 <body>
 
 <header>
-<h1>PrintReady</h1>
-<p>Turn document photos into clean, print-ready PDFs.</p>
+  <h1>PrintReady</h1>
+  <p>Turn document photos into clean, print-ready PDFs.</p>
 </header>
 
 <main>
 
 <div class="card">
-<h2>📄 Your document</h2>
 
-<div class="upload">
-<strong>Front side</strong>
-<input id="front" type="file" accept="image/*">
-<img id="frontPreview" class="preview">
-</div>
+  <h2>📄 Your document</h2>
 
-<div class="upload">
-<strong>Back side</strong>
-<input id="back" type="file" accept="image/*">
-<img id="backPreview" class="preview">
-</div>
+  <div class="upload">
+    <strong>Front side</strong>
+    <input id="front" type="file" accept="image/*">
+    <img id="frontPreview" class="preview">
+  </div>
 
-<p class="note">
-Your images are processed in your browser. They are not uploaded to a PrintReady server.
-</p>
-</div>
+  <div class="upload">
+    <strong>Back side</strong>
+    <input id="back" type="file" accept="image/*">
+    <img id="backPreview" class="preview">
+  </div>
 
-<div class="card">
-<h2>🖨️ A4 layout</h2>
+  <p class="note">
+    Your images are processed in your browser.
+    They are not uploaded to a PrintReady server.
+  </p>
 
-<p class="note">
-Both sides will be placed neatly on one A4 page with margins, ready for printing.
-</p>
-
-<button id="makePdf" class="primary" disabled>
-Create A4 PDF
-</button>
-
-<button id="downloadAgain" class="secondary" style="display:none">
-Create Another
-</button>
-
-<div id="success" class="success">
-✅ Your print-ready PDF has been created.
-</div>
 </div>
 
 <div class="card">
-<h2>PrintReady</h2>
-<p class="note">
-Made for everyday document problems — Aadhaar, PAN, driving licence,
-certificates, forms and other documents that need to be printed neatly.
-</p>
+
+  <h2>🖨️ A4 layout</h2>
+
+  <p class="note">
+    Both sides will be placed neatly on one A4 page with margins,
+    ready for printing.
+  </p>
+
+  <button id="makePdf" class="primary" disabled>
+    Create A4 PDF
+  </button>
+
+  <button id="downloadAgain" class="secondary" style="display:none">
+    Create Another
+  </button>
+
+  <div id="success" class="success">
+    ✅ Your print-ready PDF has been created.
+  </div>
+
+</div>
+
+<div class="card">
+
+  <h2>PrintReady</h2>
+
+  <p class="note">
+    Made for everyday document problems — Aadhaar, PAN,
+    driving licence, certificates, forms and other documents
+    that need to be printed neatly.
+  </p>
+
 </div>
 
 </main>
@@ -140,8 +191,10 @@ certificates, forms and other documents that need to be printed neatly.
 
 const frontInput=document.getElementById("front");
 const backInput=document.getElementById("back");
+
 const frontPreview=document.getElementById("frontPreview");
 const backPreview=document.getElementById("backPreview");
+
 const makePdf=document.getElementById("makePdf");
 const success=document.getElementById("success");
 const downloadAgain=document.getElementById("downloadAgain");
@@ -150,139 +203,151 @@ let frontFile=null;
 let backFile=null;
 
 function showPreview(input,img,side){
- input.addEventListener("change",()=>{
-   const file=input.files[0];
-   if(!file)return;
 
-   if(side==="front")frontFile=file;
-   else backFile=file;
+  input.addEventListener("change",()=>{
 
-   img.src=URL.createObjectURL(file);
-   img.style.display="block";
+    const file=input.files[0];
 
-   if(frontFile || backFile){
-     makePdf.disabled=false;
-   }
- });
+    if(!file)return;
+
+    if(side==="front"){
+      frontFile=file;
+    }else{
+      backFile=file;
+    }
+
+    img.src=URL.createObjectURL(file);
+    img.style.display="block";
+
+    if(frontFile || backFile){
+      makePdf.disabled=false;
+    }
+
+  });
+
 }
 
 showPreview(frontInput,frontPreview,"front");
 showPreview(backInput,backPreview,"back");
 
+
 function loadImage(file){
- return new Promise((resolve,reject)=>{
-   const img=new Image();
 
-   img.onload=()=>resolve(img);
-   img.onerror=reject;
+  return new Promise((resolve,reject)=>{
 
-   img.src=URL.createObjectURL(file);
- });
+    const img=new Image();
+
+    img.onload=()=>resolve(img);
+    img.onerror=reject;
+
+    img.src=URL.createObjectURL(file);
+
+  });
+
 }
+
 
 function drawDocument(pdf,img,y){
 
- const pageWidth=210;
- const margin=12;
- const maxWidth=pageWidth-(margin*2);
- const maxHeight=125;
+  const pageWidth=210;
 
- let width=img.width;
- let height=img.height;
+  const margin=12;
 
- const ratio=Math.min(
-   maxWidth/width,
-   maxHeight/height
- );
+  const maxWidth=pageWidth-(margin*2);
 
- width*=ratio;
- height*=ratio;
+  const maxHeight=125;
 
- const x=(pageWidth-width)/2;
+  let width=img.width;
+  let height=img.height;
 
- pdf.addImage(
-   img,
-   "JPEG",
-   x,
-   y,
-   width,
-   height
- );
+  const ratio=Math.min(
+    maxWidth/width,
+    maxHeight/height
+  );
 
- return y+height;
+  width*=ratio;
+  height*=ratio;
+
+  const x=(pageWidth-width)/2;
+
+  pdf.addImage(
+    img,
+    "JPEG",
+    x,
+    y,
+    width,
+    height
+  );
+
+  return y+height;
+
 }
+
 
 makePdf.addEventListener("click",async()=>{
 
- try{
+  try{
 
-   makePdf.disabled=true;
-   makePdf.textContent="Creating PDF…";
+    makePdf.disabled=true;
+    makePdf.textContent="Creating PDF…";
 
-   const {jsPDF}=window.jspdf;
+    const {jsPDF}=window.jspdf;
 
-   const pdf=new jsPDF({
-     orientation:"portrait",
-     unit:"mm",
-     format:"a4"
-   });
+    const pdf=new jsPDF({
+      orientation:"portrait",
+      unit:"mm",
+      format:"a4"
+    });
 
-   pdf.setFont("helvetica","bold");
-   pdf.setFontSize(16);
-   pdf.text("Document Copy",105,12,{align:"center"});
+    let y=15;
 
-   let y=20;
+    if(frontFile){
 
-   if(frontFile){
-     const img=await loadImage(frontFile);
+      const img=await loadImage(frontFile);
 
-     pdf.setFontSize(10);
-     pdf.text("FRONT",12,y);
+      y=drawDocument(pdf,img,y);
 
-     y+=4;
-     y=drawDocument(pdf,img,y);
-     y+=10;
-   }
+      y+=10;
 
-   if(backFile){
+    }
 
-     const img=await loadImage(backFile);
+    if(backFile){
 
-     pdf.setFontSize(10);
-     pdf.text("BACK",12,y);
+      const img=await loadImage(backFile);
 
-     y+=4;
-     drawDocument(pdf,img,y);
-   }
+      drawDocument(pdf,img,y);
 
-   pdf.setFontSize(7);
-   pdf.setFont("helvetica","normal");
-   pdf.text(
-     "Created with PrintReady",
-     105,
-     289,
-     {align:"center"}
-   );
+    }
 
-   pdf.save("printready-document.pdf");
+    pdf.save("printready-document.pdf");
 
-   success.style.display="block";
-   downloadAgain.style.display="block";
+    success.style.display="block";
 
-   makePdf.textContent="PDF Created ✓";
+    downloadAgain.style.display="block";
 
- }catch(error){
+    makePdf.textContent="PDF Created ✓";
 
-   alert("Something went wrong. Please try another image.");
+  }catch(error){
 
-   makePdf.disabled=false;
-   makePdf.textContent="Create A4 PDF";
- }
+    console.error(error);
+
+    alert(
+      "Something went wrong. Please try again."
+    );
+
+    makePdf.disabled=false;
+
+    makePdf.textContent="Create A4 PDF";
+
+  }
 
 });
 
+
 downloadAgain.addEventListener("click",()=>{
- location.reload();
+
+  location.reload();
+
 });
 
 </script>
