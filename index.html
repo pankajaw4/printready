@@ -1,2293 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1"
->
+<title>PrintReady</title>
 
-<title>PrintReady – Document to A4 PDF</title>
-
-
-<!-- PDF ENGINE -->
+<script src="https://docs.opencv.org/4.x/opencv.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-
-<!-- OPENCV -->
-<script>
-
-let cvReadyResolve;
-
-const cvReady = new Promise(function(resolve){
-
-    cvReadyResolve = resolve;
-
-});
-
-
-function onOpenCvReady(){
-
-    if(typeof cv === "undefined"){
-        return;
-    }
-
-
-    if(cv.Mat){
-
-        cvReadyResolve();
-
-    }else{
-
-        cv.onRuntimeInitialized = function(){
-
-            cvReadyResolve();
-
-        };
-
-    }
-
-}
-
-</script>
-
-
-<script
-    async
-    src="https://docs.opencv.org/4.x/opencv.js"
-    onload="onOpenCvReady()"
-></script>
-
-
-<!-- TESSERACT -->
-<script
-    src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-
-/* =====================================================
-   BASE
-===================================================== */
-
 *{
     box-sizing:border-box;
 }
 
-
 body{
-
     margin:0;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
     background:#f5f7fb;
-
-    color:#172033;
-
+    color:#111827;
 }
 
-
-/* =====================================================
-   HEADER
-===================================================== */
+.container{
+    max-width:620px;
+    margin:auto;
+    padding:22px 16px 40px;
+}
 
 header{
-
-    background:#111827;
-
-    color:white;
-
-    padding:28px 20px;
-
-    text-align:center;
-
+    margin-bottom:22px;
 }
 
-
-header h1{
-
-    margin:0;
-
+.logo{
     font-size:30px;
-
+    font-weight:800;
+    letter-spacing:-1px;
 }
 
-
-header p{
-
-    margin:8px 0 0;
-
-    color:#b9c1d0;
-
+.tagline{
+    color:#6b7280;
+    margin-top:5px;
+    font-size:15px;
 }
-
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-main{
-
-    max-width:650px;
-
-    margin:auto;
-
-    padding:20px;
-
-}
-
 
 .card{
-
     background:white;
-
-    border-radius:18px;
-
+    border-radius:20px;
     padding:20px;
-
     margin-bottom:16px;
-
-    box-shadow:
-        0 5px 20px rgba(0,0,0,.06);
-
+    box-shadow:0 6px 24px rgba(0,0,0,.06);
 }
 
-
-h2{
-
+.card h2{
+    margin:0 0 6px;
     font-size:19px;
-
-    margin-top:0;
-
 }
 
-
-/* =====================================================
-   UPLOAD
-===================================================== */
+.card p{
+    margin:0 0 15px;
+    color:#6b7280;
+    font-size:14px;
+    line-height:1.5;
+}
 
 .upload{
-
-    border:
-        2px dashed #c8cfdb;
-
-    border-radius:14px;
-
-    padding:20px;
-
-    margin:12px 0;
-
-}
-
-
-.upload-title{
-
-    text-align:center;
-
-    font-weight:600;
-
-    font-size:18px;
-
-}
-
-
-input{
-
     width:100%;
-
-    margin-top:12px;
-
+    border:2px dashed #cbd5e1;
+    border-radius:16px;
+    padding:18px;
+    text-align:center;
+    background:#f8fafc;
+    cursor:pointer;
 }
 
+.upload:hover{
+    background:#f1f5f9;
+}
+
+.upload input{
+    display:none;
+}
 
 .preview{
-
-    display:none;
-
     width:100%;
-
-    max-height:300px;
-
-    object-fit:contain;
-
-    margin-top:14px;
-
-    border-radius:10px;
-
-    background:#eee;
-
+    margin-top:15px;
+    border-radius:14px;
+    display:block;
+    background:#f1f5f9;
 }
-
-
-/* =====================================================
-   STATUS
-===================================================== */
 
 .status{
-
-    display:none;
-
-    margin-top:12px;
-
-    padding:13px;
-
-    border-radius:10px;
-
-    background:#eef4ff;
-
-    color:#31558c;
-
-    font-size:14px;
-
-    line-height:1.45;
-
-    text-align:center;
-
-}
-
-
-.note{
-
+    margin-top:10px;
     font-size:13px;
-
-    color:#687386;
-
-    line-height:1.5;
-
+    color:#64748b;
 }
-
-
-/* =====================================================
-   BUTTONS
-===================================================== */
 
 button{
-
-    width:100%;
-
     border:0;
-
-    border-radius:12px;
-
-    padding:15px;
-
-    font-size:17px;
-
-    font-weight:600;
-
+    border-radius:13px;
+    padding:13px 17px;
+    font-size:15px;
+    font-weight:700;
     cursor:pointer;
-
 }
-
-
-button:disabled{
-
-    opacity:.45;
-
-}
-
 
 .primary{
-
-    background:#2563eb;
-
+    width:100%;
+    background:#111827;
     color:white;
-
+    font-size:16px;
+    padding:16px;
 }
-
 
 .secondary{
-
-    background:#e9eef7;
-
-    color:#172033;
-
-    margin-top:10px;
-
+    background:#eef2ff;
+    color:#3730a3;
 }
 
-
-.green{
-
-    background:#16a34a;
-
-    color:white;
-
+.danger{
+    background:#fee2e2;
+    color:#991b1b;
 }
 
-
-.fix{
-
-    background:#fff4d6;
-
-    color:#8a5a00;
-
-    margin-top:10px;
-
-}
-
-
-/* =====================================================
-   SUCCESS
-===================================================== */
-
-.success{
-
-    display:none;
-
-    background:#e9f9ef;
-
-    color:#126b36;
-
-    padding:13px;
-
-    border-radius:10px;
-
+.actions{
+    display:flex;
+    gap:8px;
     margin-top:12px;
-
+    flex-wrap:wrap;
 }
 
-
-/* =====================================================
-   MANUAL EDITOR
-===================================================== */
-
-.editor{
-
-    display:none;
-
-    margin-top:14px;
-
+.hidden{
+    display:none !important;
 }
 
-
-.editor-title{
-
-    font-size:14px;
-
-    font-weight:600;
-
-    margin-bottom:8px;
-
-}
-
-
-.editor-help{
-
+.info{
+    background:#eff6ff;
+    border-radius:15px;
+    padding:15px;
     font-size:13px;
-
-    color:#687386;
-
-    margin-bottom:10px;
-
-    line-height:1.4;
-
+    color:#1e40af;
+    line-height:1.5;
 }
 
-
-.crop-wrap{
-
-    width:100%;
-
+#manualEditor{
+    position:relative;
+    margin-top:15px;
+    background:#111827;
+    border-radius:15px;
     overflow:hidden;
-
-    border-radius:12px;
-
-    background:#111;
-
-    touch-action:none;
-
 }
 
-
-.crop-canvas{
-
-    display:block;
-
+#manualCanvas{
     width:100%;
-
-    height:auto;
-
-    touch-action:none;
-
+    display:block;
 }
 
-
-.editor-buttons{
-
-    margin-top:10px;
-
-}
-
-
-.small-button{
-
+.manualHelp{
     padding:12px;
-
-    font-size:15px;
-
+    color:white;
+    font-size:13px;
+    background:#1f2937;
 }
 
-
-.tools{
-
-    display:none;
-
-    margin-top:10px;
-
+.corner{
+    position:absolute;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#2563eb;
+    border:3px solid white;
+    transform:translate(-50%,-50%);
+    touch-action:none;
 }
 
-
-/* =====================================================
-   LOADING
-===================================================== */
-
-.loading{
-
+#loading{
     position:fixed;
-
     inset:0;
-
-    display:none;
-
+    background:rgba(255,255,255,.9);
+    display:flex;
     align-items:center;
-
     justify-content:center;
-
-    background:rgba(17,24,39,.45);
-
     z-index:9999;
-
 }
 
-
-.loading-box{
-
+.loaderBox{
     background:white;
-
-    border-radius:16px;
-
-    padding:22px;
-
-    width:calc(100% - 50px);
-
-    max-width:340px;
-
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 40px rgba(0,0,0,.15);
     text-align:center;
-
-    box-shadow:
-        0 15px 50px rgba(0,0,0,.2);
-
+    max-width:280px;
 }
-
 
 .spinner{
-
-    width:34px;
-
-    height:34px;
-
-    border:
-        4px solid #dbe4f5;
-
-    border-top-color:#2563eb;
-
+    width:35px;
+    height:35px;
+    border:4px solid #e5e7eb;
+    border-top-color:#111827;
     border-radius:50%;
-
+    animation:spin .8s linear infinite;
     margin:0 auto 14px;
-
-    animation:
-        spin .8s linear infinite;
-
 }
-
 
 @keyframes spin{
-
-    to{
-        transform:rotate(360deg);
-    }
-
+    to{transform:rotate(360deg);}
 }
-
 </style>
-
 </head>
-
 
 <body>
 
+<div id="loading" class="hidden">
+    <div class="loaderBox">
+        <div class="spinner"></div>
+        <b id="loadingText">Processing…</b>
+    </div>
+</div>
+
+<div class="container">
 
 <header>
-
-<h1>PrintReady</h1>
-
-<p>
-Turn document photos into clean, print-ready PDFs.
-</p>
-
+    <div class="logo">PrintReady</div>
+    <div class="tagline">
+        Turn document photos into clean, print-ready PDFs.
+    </div>
 </header>
 
-
-<main>
-
-
-<!-- =================================================
-     DOCUMENT
-================================================== -->
-
 <div class="card">
+    <h2>Front side</h2>
+    <p>Select an existing photo. PrintReady will automatically detect, crop, straighten and orient the document.</p>
 
-<h2>📄 Your document</h2>
+    <label class="upload">
+        <input id="frontInput" type="file" accept="image/*">
+        📄 Choose front-side photo
+    </label>
 
+    <img id="frontPreview" class="preview hidden">
 
-<!-- FRONT -->
+    <div id="frontStatus" class="status"></div>
 
-<div class="upload">
-
-<div class="upload-title">
-Front side
-</div>
-
-
-<input
-    id="front"
-    type="file"
-    accept="image/*"
->
-
-
-<img
-    id="frontPreview"
-    class="preview"
->
-
-
-<div
-    id="frontStatus"
-    class="status">
-</div>
-
-
-<div
-    id="frontEditor"
-    class="editor">
-
-    <div class="editor-title">
-        ✂️ Adjust the document
-    </div>
-
-    <div class="editor-help">
-        Drag the four blue corners onto the
-        four corners of your document.
-    </div>
-
-    <div class="crop-wrap">
-
-        <canvas
-            id="frontCropCanvas"
-            class="crop-canvas">
-        </canvas>
-
-    </div>
-
-    <div class="editor-buttons">
-
-        <button
-            id="frontApply"
-            class="green small-button">
-
-            Apply Crop
-
+    <div id="frontActions" class="actions hidden">
+        <button class="secondary" onclick="rotateFront()">
+            Rotate 90°
         </button>
 
-    </div>
-
-</div>
-
-
-<div
-    id="frontTools"
-    class="tools">
-
-    <button
-        id="frontFix"
-        class="fix small-button">
-
-        ✂️ Adjust corners
-
-    </button>
-
-
-    <button
-        id="frontRotate"
-        class="secondary small-button">
-
-        ↻ Rotate 90°
-
-    </button>
-
-</div>
-
-</div>
-
-
-<!-- BACK -->
-
-<div class="upload">
-
-<div class="upload-title">
-Back side
-</div>
-
-
-<input
-    id="back"
-    type="file"
-    accept="image/*"
->
-
-
-<img
-    id="backPreview"
-    class="preview"
->
-
-
-<div
-    id="backStatus"
-    class="status">
-</div>
-
-
-<div
-    id="backEditor"
-    class="editor">
-
-    <div class="editor-title">
-        ✂️ Adjust the document
-    </div>
-
-    <div class="editor-help">
-        Drag the four blue corners onto the
-        four corners of your document.
-    </div>
-
-    <div class="crop-wrap">
-
-        <canvas
-            id="backCropCanvas"
-            class="crop-canvas">
-        </canvas>
-
-    </div>
-
-    <div class="editor-buttons">
-
-        <button
-            id="backApply"
-            class="green small-button">
-
-            Apply Crop
-
+        <button class="secondary" onclick="openManual('front')">
+            Adjust corners
         </button>
-
     </div>
 
-</div>
+    <div id="frontEditor" class="hidden">
+        <div id="manualEditor">
+            <canvas id="frontCanvas"></canvas>
 
+            <div id="frontC1" class="corner"></div>
+            <div id="frontC2" class="corner"></div>
+            <div id="frontC3" class="corner"></div>
+            <div id="frontC4" class="corner"></div>
 
-<div
-    id="backTools"
-    class="tools">
-
-    <button
-        id="backFix"
-        class="fix small-button">
-
-        ✂️ Adjust corners
-
-    </button>
-
-
-    <button
-        id="backRotate"
-        class="secondary small-button">
-
-        ↻ Rotate 90°
-
-    </button>
-
-</div>
-
-</div>
-
-
-<p class="note">
-
-Your images are processed directly in your browser.
-They are not uploaded to a PrintReady server.
-
-</p>
-
-</div>
-
-
-
-<!-- =================================================
-     PDF
-================================================== -->
-
-<div class="card">
-
-<h2>🖨️ A4 layout</h2>
-
-
-<p class="note">
-
-PrintReady automatically detects, straightens and
-orients your document. Manual adjustment is available
-only when necessary.
-
-</p>
-
-
-<button
-    id="makePdf"
-    class="primary"
-    disabled>
-
-Create A4 PDF
-
-</button>
-
-
-<button
-    id="again"
-    class="secondary"
-    style="display:none">
-
-Create Another
-
-</button>
-
-
-<div
-    id="success"
-    class="success">
-
-✅ Your print-ready PDF has been created.
-
-</div>
-
-</div>
-
-
-
-<!-- =================================================
-     INFO
-================================================== -->
-
-<div class="card">
-
-<h2>PrintReady</h2>
-
-<p class="note">
-
-Made for everyday document problems — Aadhaar,
-PAN, driving licence, certificates, forms and
-other documents that need to be printed neatly.
-
-</p>
-
-</div>
-
-
-</main>
-
-
-<!-- =================================================
-     LOADING
-================================================== -->
-
-<div
-    id="loading"
-    class="loading">
-
-    <div class="loading-box">
-
-        <div class="spinner"></div>
-
-        <div
-            id="loadingText">
-
-            Processing document…
-
+            <div class="manualHelp">
+                Drag the four blue points onto the four document corners.
+            </div>
         </div>
 
+        <div class="actions">
+            <button class="primary" onclick="applyManual('front')">
+                Apply crop
+            </button>
+        </div>
     </div>
+</div>
+
+
+<div class="card">
+    <h2>Back side</h2>
+    <p>Optional. Add the back-side photo if you need both sides on one A4 page.</p>
+
+    <label class="upload">
+        <input id="backInput" type="file" accept="image/*">
+        📄 Choose back-side photo
+    </label>
+
+    <img id="backPreview" class="preview hidden">
+
+    <div id="backStatus" class="status"></div>
+
+    <div id="backActions" class="actions hidden">
+        <button class="secondary" onclick="rotateBack()">
+            Rotate 90°
+        </button>
+
+        <button class="secondary" onclick="openManual('back')">
+            Adjust corners
+        </button>
+    </div>
+
+    <div id="backEditor" class="hidden">
+        <div id="manualEditor">
+            <canvas id="backCanvas"></canvas>
+
+            <div id="backC1" class="corner"></div>
+            <div id="backC2" class="corner"></div>
+            <div id="backC3" class="corner"></div>
+            <div id="backC4" class="corner"></div>
+
+            <div class="manualHelp">
+                Drag the four blue points onto the four document corners.
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="primary" onclick="applyManual('back')">
+                Apply crop
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div class="card">
+    <h2>A4 layout</h2>
+
+    <p>
+        Your detected document(s) will be placed neatly on an A4 page.
+    </p>
+
+    <button id="createPdf" class="primary">
+        Create A4 PDF
+    </button>
+</div>
+
+
+<div class="info">
+    🔒 Your photos are processed directly in your browser.
+    They are not uploaded to a PrintReady server.
+</div>
 
 </div>
 
 
 <script>
 
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const frontInput =
-    document.getElementById("front");
-
-const backInput =
-    document.getElementById("back");
-
-
-const frontPreview =
-    document.getElementById("frontPreview");
-
-const backPreview =
-    document.getElementById("backPreview");
-
-
-const frontStatus =
-    document.getElementById("frontStatus");
-
-const backStatus =
-    document.getElementById("backStatus");
-
-
-const frontEditor =
-    document.getElementById("frontEditor");
-
-const backEditor =
-    document.getElementById("backEditor");
-
-
-const frontCropCanvas =
-    document.getElementById("frontCropCanvas");
-
-const backCropCanvas =
-    document.getElementById("backCropCanvas");
-
-
-const frontApply =
-    document.getElementById("frontApply");
-
-const backApply =
-    document.getElementById("backApply");
-
-
-const frontFix =
-    document.getElementById("frontFix");
-
-const backFix =
-    document.getElementById("backFix");
-
-
-const frontRotate =
-    document.getElementById("frontRotate");
-
-const backRotate =
-    document.getElementById("backRotate");
-
-
-const frontTools =
-    document.getElementById("frontTools");
-
-const backTools =
-    document.getElementById("backTools");
-
-
-const makePdf =
-    document.getElementById("makePdf");
-
-
-const again =
-    document.getElementById("again");
-
-
-const success =
-    document.getElementById("success");
-
-
-const loading =
-    document.getElementById("loading");
-
-
-const loadingText =
-    document.getElementById("loadingText");
-
-
-
-/* =====================================================
-   STATE
-===================================================== */
-
 let frontCanvas = null;
-
 let backCanvas = null;
 
+let frontOriginal = null;
+let backOriginal = null;
 
-let frontSource = null;
+let frontRotation = 0;
+let backRotation = 0;
 
-let backSource = null;
+let currentManualSide = null;
 
-
-const manualStates =
-    new Map();
-
-
-let orientationWorker =
-    null;
-
-let orientationWorkerPromise =
-    null;
+let orientationWorker = null;
+let orientationWorkerPromise = null;
 
 
+/* =========================================================
+   BASIC IMAGE HELPERS
+========================================================= */
 
-/* =====================================================
-   LOADING UI
-===================================================== */
+function fileToImage(file){
+    return new Promise((resolve,reject)=>{
+        const reader = new FileReader();
 
-function showLoading(message){
+        reader.onload = () => {
+            const img = new Image();
 
-    loadingText.textContent =
-        message;
+            img.onload = () => resolve(img);
+            img.onerror = reject;
 
-    loading.style.display =
-        "flex";
+            img.src = reader.result;
+        };
 
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 
-
-function hideLoading(){
-
-    loading.style.display =
-        "none";
-
-}
-
-
-
-/* =====================================================
-   LOAD IMAGE
-===================================================== */
-
-function loadImage(file){
-
-    return new Promise(
-        function(resolve,reject){
-
-            const img =
-                new Image();
-
-
-            img.onload =
-                function(){
-
-                    resolve(img);
-
-                };
-
-
-            img.onerror =
-                reject;
-
-
-            img.src =
-                URL.createObjectURL(file);
-
-        }
-    );
-
-}
-
-
-
-/* =====================================================
-   IMAGE → CANVAS
-===================================================== */
 
 function imageToCanvas(img){
+    const canvas = document.createElement("canvas");
 
-    const maximum =
-        1800;
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
 
-
-    let width =
-        img.naturalWidth ||
-        img.width;
-
-
-    let height =
-        img.naturalHeight ||
-        img.height;
-
-
-    const scale =
-        Math.min(
-            1,
-            maximum /
-            Math.max(
-                width,
-                height
-            )
-        );
-
-
-    width =
-        Math.round(
-            width*scale
-        );
-
-
-    height =
-        Math.round(
-            height*scale
-        );
-
-
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
-
-
-    canvas.width =
-        width;
-
-
-    canvas.height =
-        height;
-
-
-    canvas
-        .getContext("2d")
-        .drawImage(
-            img,
-            0,
-            0,
-            width,
-            height
-        );
-
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img,0,0);
 
     return canvas;
-
 }
 
-
-
-/* =====================================================
-   DISTANCE
-===================================================== */
-
-function distance(a,b){
-
-    return Math.hypot(
-        a.x-b.x,
-        a.y-b.y
-    );
-
-}
-
-
-
-/* =====================================================
-   ORDER POINTS
-===================================================== */
-
-function orderPoints(points){
-
-    let tl = null;
-
-    let tr = null;
-
-    let br = null;
-
-    let bl = null;
-
-
-    let minSum =
-        Infinity;
-
-    let maxSum =
-        -Infinity;
-
-
-    let minDiff =
-        Infinity;
-
-    let maxDiff =
-        -Infinity;
-
-
-    points.forEach(
-        function(p){
-
-            const sum =
-                p.x+p.y;
-
-
-            const diff =
-                p.x-p.y;
-
-
-            if(sum<minSum){
-
-                minSum =
-                    sum;
-
-                tl =
-                    p;
-
-            }
-
-
-            if(sum>maxSum){
-
-                maxSum =
-                    sum;
-
-                br =
-                    p;
-
-            }
-
-
-            if(diff>maxDiff){
-
-                maxDiff =
-                    diff;
-
-                tr =
-                    p;
-
-            }
-
-
-            if(diff<minDiff){
-
-                minDiff =
-                    diff;
-
-                bl =
-                    p;
-
-            }
-
-        }
-    );
-
-
-    return [
-        tl,
-        tr,
-        br,
-        bl
-    ];
-
-}
-
-
-
-/* =====================================================
-   POLYGON AREA
-===================================================== */
-
-function polygonArea(points){
-
-    let area = 0;
-
-
-    for(
-        let i=0;
-        i<points.length;
-        i++
-    ){
-
-        const j =
-            (i+1) %
-            points.length;
-
-
-        area +=
-            points[i].x *
-            points[j].y;
-
-
-        area -=
-            points[j].x *
-            points[i].y;
-
-    }
-
-
-    return Math.abs(
-        area/2
-    );
-
-}
-
-
-
-/* =====================================================
-   RECTANGLE QUALITY
-===================================================== */
-
-function rectangleQuality(points){
-
-    const p =
-        orderPoints(points);
-
-
-    if(
-        !p[0] ||
-        !p[1] ||
-        !p[2] ||
-        !p[3]
-    ){
-
-        return null;
-
-    }
-
-
-    const top =
-        distance(
-            p[0],
-            p[1]
-        );
-
-
-    const right =
-        distance(
-            p[1],
-            p[2]
-        );
-
-
-    const bottom =
-        distance(
-            p[3],
-            p[2]
-        );
-
-
-    const left =
-        distance(
-            p[0],
-            p[3]
-        );
-
-
-    const width =
-        (top+bottom)/2;
-
-
-    const height =
-        (left+right)/2;
-
-
-    if(
-        width<1 ||
-        height<1
-    ){
-
-        return null;
-
-    }
-
-
-    const ratio =
-        Math.max(
-            width/height,
-            height/width
-        );
-
-
-    /*
-       Broad ID-card ratio range.
-    */
-
-    if(
-        ratio<1.25 ||
-        ratio>2.15
-    ){
-
-        return null;
-
-    }
-
-
-    const widthBalance =
-        Math.min(
-            top,
-            bottom
-        ) /
-        Math.max(
-            top,
-            bottom
-        );
-
-
-    const heightBalance =
-        Math.min(
-            left,
-            right
-        ) /
-        Math.max(
-            left,
-            right
-        );
-
-
-    if(
-        widthBalance<0.55 ||
-        heightBalance<0.55
-    ){
-
-        return null;
-
-    }
-
-
-    return {
-
-        points:p,
-
-        width:width,
-
-        height:height,
-
-        ratio:ratio
-
-    };
-
-}
-
-
-
-/* =====================================================
-   ADD CANDIDATE
-===================================================== */
-
-function addCandidate(
-    candidates,
-    points,
-    imageArea
-){
-
-    const quality =
-        rectangleQuality(
-            points
-        );
-
-
-    if(!quality){
-        return;
-    }
-
-
-    const area =
-        polygonArea(
-            quality.points
-        );
-
-
-    const areaRatio =
-        area/imageArea;
-
-
-    /*
-       Ignore small internal rectangles.
-
-       This is what prevents the
-       Aadhaar portrait from winning.
-    */
-
-    if(
-        areaRatio<0.10
-    ){
-
-        return;
-
-    }
-
-
-    if(
-        areaRatio>0.92
-    ){
-
-        return;
-
-    }
-
-
-    let score =
-        areaRatio*100;
-
-
-    /*
-       Strong preference for large
-       document candidates.
-    */
-
-    if(
-        areaRatio>=0.20
-    ){
-
-        score*=1.25;
-
-    }
-
-
-    if(
-        areaRatio>=0.30
-    ){
-
-        score*=1.20;
-
-    }
-
-
-    /*
-       Penalize small internal shapes.
-    */
-
-    if(
-        areaRatio<0.16
-    ){
-
-        score*=0.25;
-
-    }
-
-
-    /*
-       Prefer standard card proportions.
-    */
-
-    const ratioDifference =
-        Math.abs(
-            quality.ratio-1.586
-        );
-
-
-    score +=
-        Math.max(
-            0,
-            15 -
-            ratioDifference*15
-        );
-
-
-    candidates.push({
-
-        points:
-            quality.points,
-
-        width:
-            quality.width,
-
-        height:
-            quality.height,
-
-        area:
-            area,
-
-        areaRatio:
-            areaRatio,
-
-        ratio:
-            quality.ratio,
-
-        score:
-            score
-
-    });
-
-}
-
-
-
-/* =====================================================
-   AUTOMATIC DOCUMENT DETECTION
-===================================================== */
-
-async function autoDetect(file){
-
-    await cvReady;
-
-
-    const img =
-        await loadImage(file);
-
-
-    const source =
-        imageToCanvas(img);
-
-
-    const src =
-        cv.imread(source);
-
-
-    const gray =
-        new cv.Mat();
-
-
-    cv.cvtColor(
-        src,
-        gray,
-        cv.COLOR_RGBA2GRAY
-    );
-
-
-    const imageArea =
-        src.cols *
-        src.rows;
-
-
-    const candidates = [];
-
-
-    /*
-       Multiple edge passes.
-    */
-
-    const passes = [
-
-        [20,70],
-
-        [30,100],
-
-        [50,150],
-
-        [70,200]
-
-    ];
-
-
-    for(
-        let pass=0;
-        pass<passes.length;
-        pass++
-    ){
-
-        const blur =
-            new cv.Mat();
-
-
-        const edges =
-            new cv.Mat();
-
-
-        cv.GaussianBlur(
-            gray,
-            blur,
-            new cv.Size(5,5),
-            0
-        );
-
-
-        cv.Canny(
-            blur,
-            edges,
-            passes[pass][0],
-            passes[pass][1]
-        );
-
-
-        const kernel =
-            cv.getStructuringElement(
-                cv.MORPH_RECT,
-                new cv.Size(9,9)
-            );
-
-
-        cv.morphologyEx(
-            edges,
-            edges,
-            cv.MORPH_CLOSE,
-            kernel
-        );
-
-
-        const contours =
-            new cv.MatVector();
-
-
-        const hierarchy =
-            new cv.Mat();
-
-
-        cv.findContours(
-            edges,
-            contours,
-            hierarchy,
-            cv.RETR_LIST,
-            cv.CHAIN_APPROX_SIMPLE
-        );
-
-
-        for(
-            let i=0;
-            i<contours.size();
-            i++
-        ){
-
-            const contour =
-                contours.get(i);
-
-
-            const area =
-                Math.abs(
-                    cv.contourArea(
-                        contour
-                    )
-                );
-
-
-            if(
-                area<
-                imageArea*0.10 ||
-                area>
-                imageArea*0.92
-            ){
-
-                contour.delete();
-
-                continue;
-
-            }
-
-
-            const perimeter =
-                cv.arcLength(
-                    contour,
-                    true
-                );
-
-
-            const approx =
-                new cv.Mat();
-
-
-            cv.approxPolyDP(
-                contour,
-                approx,
-                0.02*perimeter,
-                true
-            );
-
-
-            if(
-                approx.rows===4
-            ){
-
-                const points=[];
-
-
-                for(
-                    let j=0;
-                    j<4;
-                    j++
-                ){
-
-                    points.push({
-
-                        x:
-                            approx.data32S[
-                                j*2
-                            ],
-
-                        y:
-                            approx.data32S[
-                                j*2+1
-                            ]
-
-                    });
-
-                }
-
-
-                addCandidate(
-                    candidates,
-                    points,
-                    imageArea
-                );
-
-            }
-
-
-            approx.delete();
-
-            contour.delete();
-
-        }
-
-
-        blur.delete();
-
-        edges.delete();
-
-        kernel.delete();
-
-        contours.delete();
-
-        hierarchy.delete();
-
-    }
-
-
-    /*
-       Bright-document detection.
-    */
-
-    const thresholds =
-        [110,140,170,200];
-
-
-    for(
-        let t=0;
-        t<thresholds.length;
-        t++
-    ){
-
-        const binary =
-            new cv.Mat();
-
-
-        cv.threshold(
-            gray,
-            binary,
-            thresholds[t],
-            255,
-            cv.THRESH_BINARY
-        );
-
-
-        const kernel =
-            cv.getStructuringElement(
-                cv.MORPH_RECT,
-                new cv.Size(13,13)
-            );
-
-
-        cv.morphologyEx(
-            binary,
-            binary,
-            cv.MORPH_CLOSE,
-            kernel
-        );
-
-
-        const contours =
-            new cv.MatVector();
-
-
-        const hierarchy =
-            new cv.Mat();
-
-
-        cv.findContours(
-            binary,
-            contours,
-            hierarchy,
-            cv.RETR_EXTERNAL,
-            cv.CHAIN_APPROX_SIMPLE
-        );
-
-
-        for(
-            let i=0;
-            i<contours.size();
-            i++
-        ){
-
-            const contour =
-                contours.get(i);
-
-
-            const area =
-                Math.abs(
-                    cv.contourArea(
-                        contour
-                    )
-                );
-
-
-            if(
-                area<
-                imageArea*0.10 ||
-                area>
-                imageArea*0.92
-            ){
-
-                contour.delete();
-
-                continue;
-
-            }
-
-
-            const perimeter =
-                cv.arcLength(
-                    contour,
-                    true
-                );
-
-
-            const approx =
-                new cv.Mat();
-
-
-            cv.approxPolyDP(
-                contour,
-                approx,
-                0.025*perimeter,
-                true
-            );
-
-
-            if(
-                approx.rows===4
-            ){
-
-                const points=[];
-
-
-                for(
-                    let j=0;
-                    j<4;
-                    j++
-                ){
-
-                    points.push({
-
-                        x:
-                            approx.data32S[
-                                j*2
-                            ],
-
-                        y:
-                            approx.data32S[
-                                j*2+1
-                            ]
-
-                    });
-
-                }
-
-
-                addCandidate(
-                    candidates,
-                    points,
-                    imageArea
-                );
-
-            }
-
-
-            approx.delete();
-
-            contour.delete();
-
-        }
-
-
-        binary.delete();
-
-        kernel.delete();
-
-        contours.delete();
-
-        hierarchy.delete();
-
-    }
-
-
-    gray.delete();
-
-    src.delete();
-
-
-    candidates.sort(
-        function(a,b){
-
-            return b.score-a.score;
-
-        }
-    );
-
-
-    const best =
-        candidates.length
-        ? candidates[0]
-        : null;
-
-
-    /*
-       Confidence gate.
-
-       Never create a bad crop merely
-       because OpenCV found some rectangle.
-    */
-
-    const confident =
-        best &&
-        best.areaRatio>=0.16 &&
-        best.score>=20;
-
-
-    return {
-
-        source:source,
-
-        detected:!!confident,
-
-        points:
-            confident
-            ? best.points
-            : null
-
-    };
-
-}
-
-
-
-/* =====================================================
-   ROTATE CLOCKWISE
-===================================================== */
 
 function rotateClockwise(canvas){
 
-    const output =
-        document.createElement(
-            "canvas"
-        );
+    const out = document.createElement("canvas");
 
+    out.width = canvas.height;
+    out.height = canvas.width;
 
-    output.width =
-        canvas.height;
+    const ctx = out.getContext("2d");
 
-
-    output.height =
-        canvas.width;
-
-
-    const ctx =
-        output.getContext("2d");
-
-
-    ctx.translate(
-        output.width,
-        0
-    );
-
-
-    ctx.rotate(
-        Math.PI/2
-    );
-
+    ctx.translate(out.width/2,out.height/2);
+    ctx.rotate(Math.PI/2);
 
     ctx.drawImage(
         canvas,
-        0,
-        0
+        -canvas.width/2,
+        -canvas.height/2
     );
 
-
-    return output;
-
+    return out;
 }
 
-
-
-/* =====================================================
-   ROTATE 180
-===================================================== */
-
-function rotate180(canvas){
-
-    const output =
-        document.createElement(
-            "canvas"
-        );
-
-
-    output.width =
-        canvas.width;
-
-
-    output.height =
-        canvas.height;
-
-
-    const ctx =
-        output.getContext("2d");
-
-
-    ctx.translate(
-        output.width,
-        output.height
-    );
-
-
-    ctx.rotate(
-        Math.PI
-    );
-
-
-    ctx.drawImage(
-        canvas,
-        0,
-        0
-    );
-
-
-    return output;
-
-}
-
-
-
-/* =====================================================
-   ROTATE COUNTER-CLOCKWISE
-===================================================== */
 
 function rotateCounterClockwise(canvas){
 
-    const output =
-        document.createElement(
-            "canvas"
-        );
+    const out = document.createElement("canvas");
 
+    out.width = canvas.height;
+    out.height = canvas.width;
 
-    output.width =
-        canvas.height;
+    const ctx = out.getContext("2d");
 
-
-    output.height =
-        canvas.width;
-
-
-    const ctx =
-        output.getContext("2d");
-
-
-    ctx.translate(
-        0,
-        output.height
-    );
-
-
-    ctx.rotate(
-        -Math.PI/2
-    );
-
+    ctx.translate(out.width/2,out.height/2);
+    ctx.rotate(-Math.PI/2);
 
     ctx.drawImage(
         canvas,
-        0,
-        0
+        -canvas.width/2,
+        -canvas.height/2
     );
 
-
-    return output;
-
+    return out;
 }
 
 
+function rotate180(canvas){
 
-/* =====================================================
-   ORIENTATION WORKER
-===================================================== */
+    const out = document.createElement("canvas");
+
+    out.width = canvas.width;
+    out.height = canvas.height;
+
+    const ctx = out.getContext("2d");
+
+    ctx.translate(out.width/2,out.height/2);
+    ctx.rotate(Math.PI);
+
+    ctx.drawImage(
+        canvas,
+        -canvas.width/2,
+        -canvas.height/2
+    );
+
+    return out;
+}
+
+
+/* =========================================================
+   UI HELPERS
+========================================================= */
+
+function showLoading(text){
+    document.getElementById("loadingText").textContent = text;
+    document.getElementById("loading").classList.remove("hidden");
+}
+
+function hideLoading(){
+    document.getElementById("loading").classList.add("hidden");
+}
+
+
+function setPreview(side,canvas){
+
+    const preview =
+        document.getElementById(side+"Preview");
+
+    preview.src = canvas.toDataURL("image/jpeg",0.92);
+    preview.classList.remove("hidden");
+
+    document
+        .getElementById(side+"Actions")
+        .classList.remove("hidden");
+}
+
+
+function setStatus(side,text){
+    document.getElementById(side+"Status").textContent = text;
+}
+
+
+/* =========================================================
+   TESSERACT ORIENTATION ENGINE
+========================================================= */
 
 async function getOrientationWorker(){
 
-    if(
-        orientationWorker
-    ){
-
+    if(orientationWorker)
         return orientationWorker;
 
-    }
-
-
-    if(
-        orientationWorkerPromise
-    ){
-
+    if(orientationWorkerPromise)
         return orientationWorkerPromise;
 
-    }
+    orientationWorkerPromise = (async function(){
 
+        if(typeof Tesseract === "undefined"){
+            throw new Error("Orientation engine unavailable.");
+        }
 
-    orientationWorkerPromise =
-        (async function(){
-
-            if(
-                typeof Tesseract==="undefined"
-            ){
-
-                throw new Error(
-                    "Orientation engine unavailable."
-                );
-
+        const worker = await Tesseract.createWorker(
+            "eng",
+            1,
+            {
+                legacyCore:true,
+                legacyLang:true
             }
+        );
 
+        orientationWorker = worker;
 
-            /*
-               Tesseract OSD requires
-               the Legacy model.
-            */
+        return worker;
 
-            const worker =
-                await Tesseract.createWorker(
-                    "eng",
-                    1,
-                    {
-
-                        legacyCore:true,
-
-                        legacyLang:true
-
-                    }
-                );
-
-
-            orientationWorker =
-                worker;
-
-
-            return worker;
-
-        })();
-
+    })();
 
     return orientationWorkerPromise;
-
 }
 
 
+/*
+    IMPORTANT:
 
-/* =====================================================
-   AUTOMATIC ORIENTATION
-===================================================== */
+    We do NOT allow OCR to decide 90° / 270°.
 
-async function orientDocument(canvas){
+    Geometry already guarantees that an ID card becomes
+    landscape.
+
+    OCR is used ONLY for detecting a 180° upside-down card.
+*/
+
+async function orientUpsideDownOnly(canvas){
 
     try{
 
-        const worker =
-            await getOrientationWorker();
+        const worker = await getOrientationWorker();
 
-
-        const result =
-            await worker.detect(
-                canvas
-            );
-
+        const result = await worker.detect(canvas);
 
         const data =
-            result &&
-            result.data
+            result && result.data
             ? result.data
             : null;
 
-
-        if(!data){
-
+        if(!data)
             return canvas;
-
-        }
-
 
         const degrees =
-            Number(
-                data.orientation_degrees
-            );
-
+            Number(data.orientation_degrees);
 
         const confidence =
-            Number(
-                data.orientation_confidence
-            );
+            Number(data.orientation_confidence);
 
+        console.log(
+            "OSD orientation:",
+            degrees,
+            "confidence:",
+            confidence
+        );
+
+        if(
+            !Number.isFinite(degrees) ||
+            !Number.isFinite(confidence)
+        ){
+            return canvas;
+        }
 
         /*
-           OSD returns the clockwise
-           correction needed to make
-           text upright.
-
-           We only trust a real result
-           with reasonable confidence.
+            Tesseract orientation confidence around 15+
+            is considered reasonably reliable.
         */
 
-        if(
-            !Number.isFinite(degrees)
-        ){
-
+        if(confidence < 15)
             return canvas;
 
+        /*
+            Only 180 is allowed here.
+
+            90 / 270 are intentionally ignored.
+        */
+
+        if(degrees === 180){
+            return rotate180(canvas);
         }
-
-
-        if(
-            !Number.isFinite(confidence) ||
-            confidence<5
-        ){
-
-            return canvas;
-
-        }
-
-
-        if(
-            degrees===90
-        ){
-
-            return rotateClockwise(
-                canvas
-            );
-
-        }
-
-
-        if(
-            degrees===180
-        ){
-
-            return rotate180(
-                canvas
-            );
-
-        }
-
-
-        if(
-            degrees===270
-        ){
-
-            return rotateCounterClockwise(
-                canvas
-            );
-
-        }
-
 
         return canvas;
 
@@ -2298,60 +603,341 @@ async function orientDocument(canvas){
             error
         );
 
-
         return canvas;
-
     }
-
 }
 
 
+/* =========================================================
+   OPENCV DOCUMENT DETECTION
+========================================================= */
 
-/* =====================================================
-   PERSPECTIVE CROP
-===================================================== */
+function orderPoints(points){
 
-async function perspectiveCrop(
-    source,
-    points
-){
+    const sorted = points.slice();
 
-    await cvReady;
+    const sums =
+        sorted.map(p => p.x + p.y);
 
+    const diffs =
+        sorted.map(p => p.x - p.y);
+
+    const tl =
+        sorted[sums.indexOf(Math.min(...sums))];
+
+    const br =
+        sorted[sums.indexOf(Math.max(...sums))];
+
+    const tr =
+        sorted[diffs.indexOf(Math.max(...diffs))];
+
+    const bl =
+        sorted[diffs.indexOf(Math.min(...diffs))];
+
+    return [tl,tr,br,bl];
+}
+
+
+function distance(a,b){
+
+    return Math.hypot(
+        a.x-b.x,
+        a.y-b.y
+    );
+}
+
+
+function rectangleQuality(points){
 
     const ordered =
         orderPoints(points);
 
+    const tl = ordered[0];
+    const tr = ordered[1];
+    const br = ordered[2];
+    const bl = ordered[3];
+
+    const width =
+        (distance(tl,tr)+distance(bl,br))/2;
+
+    const height =
+        (distance(tl,bl)+distance(tr,br))/2;
+
+    if(width <= 0 || height <= 0)
+        return null;
+
+    const ratio =
+        Math.max(width,height) /
+        Math.min(width,height);
+
+    /*
+        Aadhaar / ID-card style documents are
+        normally clearly wider than tall.
+    */
+
+    if(ratio < 1.25 || ratio > 2.20)
+        return null;
+
+    return {
+        points:ordered,
+        width,
+        height,
+        ratio
+    };
+}
+
+
+function detectDocument(sourceCanvas){
+
+    if(
+        typeof cv === "undefined" ||
+        !cv.imread
+    ){
+        return null;
+    }
+
+    let src = null;
+    let gray = null;
+    let blur = null;
+    let edges = null;
+    let contours = null;
+    let hierarchy = null;
+
+    try{
+
+        src = cv.imread(sourceCanvas);
+
+        /*
+            Resize for faster detection.
+        */
+
+        const maxDim = 1400;
+
+        if(
+            src.cols > maxDim ||
+            src.rows > maxDim
+        ){
+
+            const scale =
+                maxDim /
+                Math.max(src.cols,src.rows);
+
+            const resized =
+                new cv.Mat();
+
+            cv.resize(
+                src,
+                resized,
+                new cv.Size(
+                    Math.round(src.cols*scale),
+                    Math.round(src.rows*scale)
+                )
+            );
+
+            src.delete();
+            src = resized;
+        }
+
+        gray = new cv.Mat();
+        blur = new cv.Mat();
+        edges = new cv.Mat();
+
+        cv.cvtColor(
+            src,
+            gray,
+            cv.COLOR_RGBA2GRAY
+        );
+
+        cv.GaussianBlur(
+            gray,
+            blur,
+            new cv.Size(5,5),
+            0
+        );
+
+        cv.Canny(
+            blur,
+            edges,
+            40,
+            120
+        );
+
+        contours = new cv.MatVector();
+        hierarchy = new cv.Mat();
+
+        cv.findContours(
+            edges,
+            contours,
+            hierarchy,
+            cv.RETR_LIST,
+            cv.CHAIN_APPROX_SIMPLE
+        );
+
+        const candidates = [];
+
+        for(let i=0;i<contours.size();i++){
+
+            const contour =
+                contours.get(i);
+
+            const area =
+                Math.abs(cv.contourArea(contour));
+
+            const imageArea =
+                src.cols * src.rows;
+
+            const areaRatio =
+                area/imageArea;
+
+            if(areaRatio < 0.10 || areaRatio > 0.92){
+                contour.delete();
+                continue;
+            }
+
+            const perimeter =
+                cv.arcLength(contour,true);
+
+            const approx =
+                new cv.Mat();
+
+            cv.approxPolyDP(
+                contour,
+                approx,
+                0.025*perimeter,
+                true
+            );
+
+            if(approx.rows === 4){
+
+                const points = [];
+
+                for(let j=0;j<4;j++){
+
+                    points.push({
+                        x:approx.intPtr(j,0)[0],
+                        y:approx.intPtr(j,0)[1]
+                    });
+                }
+
+                const quality =
+                    rectangleQuality(points);
+
+                if(quality){
+
+                    let score = 0;
+
+                    /*
+                        Strong preference for the
+                        actual document rather than
+                        small inner rectangles.
+                    */
+
+                    if(areaRatio > 0.20)
+                        score += 20;
+
+                    if(areaRatio > 0.30)
+                        score += 15;
+
+                    if(areaRatio > 0.40)
+                        score += 8;
+
+                    const ratioPenalty =
+                        Math.abs(
+                            quality.ratio - 1.586
+                        ) * 8;
+
+                    score -= ratioPenalty;
+
+                    /*
+                        Prefer larger rectangles.
+                    */
+
+                    score +=
+                        Math.min(areaRatio*100,35);
+
+                    candidates.push({
+                        score,
+                        points:quality.points,
+                        areaRatio
+                    });
+                }
+            }
+
+            approx.delete();
+            contour.delete();
+        }
+
+        if(candidates.length === 0)
+            return null;
+
+        candidates.sort(
+            (a,b)=>b.score-a.score
+        );
+
+        const best =
+            candidates[0];
+
+        const scaleX =
+            sourceCanvas.width /
+            src.cols;
+
+        const scaleY =
+            sourceCanvas.height /
+            src.rows;
+
+        return best.points.map(p=>({
+            x:p.x*scaleX,
+            y:p.y*scaleY
+        }));
+
+    }catch(error){
+
+        console.warn(
+            "OpenCV detection error:",
+            error
+        );
+
+        return null;
+
+    }finally{
+
+        if(src) src.delete();
+        if(gray) gray.delete();
+        if(blur) blur.delete();
+        if(edges) edges.delete();
+        if(contours) contours.delete();
+        if(hierarchy) hierarchy.delete();
+    }
+}
+
+
+/* =========================================================
+   PERSPECTIVE CORRECTION
+========================================================= */
+
+async function perspectiveCrop(sourceCanvas,points){
+
+    const ordered =
+        orderPoints(points);
+
+    const tl = ordered[0];
+    const tr = ordered[1];
+    const br = ordered[2];
+    const bl = ordered[3];
 
     const topWidth =
-        distance(
-            ordered[0],
-            ordered[1]
-        );
-
+        distance(tl,tr);
 
     const bottomWidth =
-        distance(
-            ordered[3],
-            ordered[2]
-        );
-
+        distance(bl,br);
 
     const leftHeight =
-        distance(
-            ordered[0],
-            ordered[3]
-        );
-
+        distance(tl,bl);
 
     const rightHeight =
-        distance(
-            ordered[1],
-            ordered[2]
-        );
+        distance(tr,br);
 
-
-    let outputWidth =
+    const width =
         Math.round(
             Math.max(
                 topWidth,
@@ -2359,8 +945,7 @@ async function perspectiveCrop(
             )
         );
 
-
-    let outputHeight =
+    const height =
         Math.round(
             Math.max(
                 leftHeight,
@@ -2368,1382 +953,728 @@ async function perspectiveCrop(
             )
         );
 
-
-    const maxSize =
-        1600;
-
-
-    const longest =
-        Math.max(
-            outputWidth,
-            outputHeight
-        );
-
-
-    if(
-        longest>maxSize
-    ){
-
-        const scale =
-            maxSize/longest;
-
-
-        outputWidth =
-            Math.round(
-                outputWidth*scale
-            );
-
-
-        outputHeight =
-            Math.round(
-                outputHeight*scale
-            );
-
-    }
-
-
-    const src =
-        cv.imread(source);
-
-
-    const srcPoints =
-        cv.matFromArray(
-            4,
-            1,
-            cv.CV_32FC2,
-            [
-
-                ordered[0].x,
-                ordered[0].y,
-
-                ordered[1].x,
-                ordered[1].y,
-
-                ordered[2].x,
-                ordered[2].y,
-
-                ordered[3].x,
-                ordered[3].y
-
-            ]
-        );
-
-
-    const dstPoints =
-        cv.matFromArray(
-            4,
-            1,
-            cv.CV_32FC2,
-            [
-
-                0,
-                0,
-
-                outputWidth,
-                0,
-
-                outputWidth,
-                outputHeight,
-
-                0,
-                outputHeight
-
-            ]
-        );
-
-
-    const matrix =
-        cv.getPerspectiveTransform(
-            srcPoints,
-            dstPoints
-        );
-
-
-    const warped =
-        new cv.Mat();
-
-
-    cv.warpPerspective(
-        src,
-        warped,
-        matrix,
-        new cv.Size(
-            outputWidth,
-            outputHeight
-        ),
-        cv.INTER_LINEAR,
-        cv.BORDER_REPLICATE
-    );
-
-
-    const result =
-        document.createElement(
-            "canvas"
-        );
-
-
-    result.width =
-        outputWidth;
-
-
-    result.height =
-        outputHeight;
-
-
-    cv.imshow(
-        result,
-        warped
-    );
-
-
-    src.delete();
-
-    srcPoints.delete();
-
-    dstPoints.delete();
-
-    matrix.delete();
-
-    warped.delete();
-
-
-    /*
-       Now let OCR/OSD determine
-       whether the document is upside down.
-    */
-
-    return await orientDocument(
-        result
-    );
-
-}
-
-
-
-/* =====================================================
-   SHOW RESULT
-===================================================== */
-
-function showResult(
-    canvas,
-    preview,
-    status,
-    tools
-){
-
-    preview.src =
-        canvas.toDataURL(
-            "image/jpeg",
-            0.95
-        );
-
-
-    preview.style.display =
-        "block";
-
-
-    status.style.display =
-        "block";
-
-
-    status.textContent =
-        "✅ Document detected, straightened and oriented.";
-
-
-    tools.style.display =
-        "block";
-
-}
-
-
-
-/* =====================================================
-   MANUAL EDITOR DRAW
-===================================================== */
-
-function drawManualEditor(state){
-
-    const canvas =
-        state.canvas;
-
-
-    const ctx =
-        canvas.getContext("2d");
-
-
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    ctx.drawImage(
-        state.source,
-        0,
-        0
-    );
-
-
-    const p =
-        state.points;
-
-
-    /*
-       Dark outside area.
-    */
-
-    ctx.fillStyle =
-        "rgba(0,0,0,.35)";
-
-
-    ctx.beginPath();
-
-
-    ctx.rect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    ctx.moveTo(
-        p[0].x,
-        p[0].y
-    );
-
-
-    ctx.lineTo(
-        p[1].x,
-        p[1].y
-    );
-
-
-    ctx.lineTo(
-        p[2].x,
-        p[2].y
-    );
-
-
-    ctx.lineTo(
-        p[3].x,
-        p[3].y
-    );
-
-
-    ctx.closePath();
-
-
-    ctx.fill(
-        "evenodd"
-    );
-
-
-    /*
-       Blue outline.
-    */
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-        p[0].x,
-        p[0].y
-    );
-
-
-    ctx.lineTo(
-        p[1].x,
-        p[1].y
-    );
-
-
-    ctx.lineTo(
-        p[2].x,
-        p[2].y
-    );
-
-
-    ctx.lineTo(
-        p[3].x,
-        p[3].y
-    );
-
-
-    ctx.closePath();
-
-
-    ctx.strokeStyle =
-        "#2563eb";
-
-
-    ctx.lineWidth =
-        Math.max(
-            3,
-            canvas.width/250
-        );
-
-
-    ctx.stroke();
-
-
-    /*
-       Handles.
-    */
-
-    p.forEach(
-        function(point,index){
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-                point.x,
-                point.y,
-                Math.max(
-                    13,
-                    canvas.width/35
-                ),
-                0,
-                Math.PI*2
-            );
-
-
-            ctx.fillStyle =
-                "white";
-
-
-            ctx.fill();
-
-
-            ctx.strokeStyle =
-                "#2563eb";
-
-
-            ctx.lineWidth =
-                4;
-
-
-            ctx.stroke();
-
-
-            ctx.fillStyle =
-                "#2563eb";
-
-
-            ctx.font =
-                "bold 14px sans-serif";
-
-
-            ctx.textAlign =
-                "center";
-
-
-            ctx.textBaseline =
-                "middle";
-
-
-            ctx.fillText(
-                String(index+1),
-                point.x,
-                point.y
-            );
-
-        }
-    );
-
-}
-
-
-
-/* =====================================================
-   CREATE MANUAL EDITOR
-===================================================== */
-
-function createManualEditor(
-    side,
-    source,
-    canvas,
-    editor
-){
-
-    const marginX =
-        source.width*0.10;
-
-
-    const marginY =
-        source.height*0.10;
-
-
-    const state = {
-
-        source:source,
-
-        canvas:canvas,
-
-        points:[
-
-            {
-                x:marginX,
-                y:marginY
-            },
-
-            {
-                x:
-                    source.width-marginX,
-
-                y:marginY
-            },
-
-            {
-                x:
-                    source.width-marginX,
-
-                y:
-                    source.height-marginY
-            },
-
-            {
-                x:marginX,
-
-                y:
-                    source.height-marginY
-            }
-
-        ],
-
-        active:-1
-
-    };
-
-
-    manualStates.set(
-        side,
-        state
-    );
-
-
-    canvas.width =
-        source.width;
-
-
-    canvas.height =
-        source.height;
-
-
-    drawManualEditor(
-        state
-    );
-
-
-    editor.style.display =
-        "block";
-
-
-    function getPoint(event){
-
-        const rect =
-            canvas.getBoundingClientRect();
-
-
-        return {
-
-            x:
-                (
-                    event.clientX -
-                    rect.left
-                ) *
-                canvas.width /
-                rect.width,
-
-            y:
-                (
-                    event.clientY -
-                    rect.top
-                ) *
-                canvas.height /
-                rect.height
-
-        };
-
-    }
-
-
-    canvas.onpointerdown =
-        function(event){
-
-            const point =
-                getPoint(event);
-
-
-            let nearest =
-                -1;
-
-
-            let nearestDistance =
-                Infinity;
-
-
-            state.points.forEach(
-                function(p,index){
-
-                    const d =
-                        distance(
-                            point,
-                            p
-                        );
-
-
-                    if(
-                        d<
-                        nearestDistance
-                    ){
-
-                        nearestDistance =
-                            d;
-
-                        nearest =
-                            index;
-
-                    }
-
-                }
-            );
-
-
-            if(
-                nearestDistance <
-                canvas.width*0.10
-            ){
-
-                state.active =
-                    nearest;
-
-
-                canvas.setPointerCapture(
-                    event.pointerId
-                );
-
-            }
-
-        };
-
-
-    canvas.onpointermove =
-        function(event){
-
-            if(
-                state.active<0
-            ){
-
-                return;
-
-            }
-
-
-            const point =
-                getPoint(event);
-
-
-            point.x =
-                Math.max(
-                    0,
-                    Math.min(
-                        canvas.width,
-                        point.x
-                    )
-                );
-
-
-            point.y =
-                Math.max(
-                    0,
-                    Math.min(
-                        canvas.height,
-                        point.y
-                    )
-                );
-
-
-            state.points[
-                state.active
-            ] =
-                point;
-
-
-            drawManualEditor(
-                state
-            );
-
-        };
-
-
-    canvas.onpointerup =
-        function(){
-
-            state.active =
-                -1;
-
-        };
-
-
-    canvas.onpointercancel =
-        function(){
-
-            state.active =
-                -1;
-
-        };
-
-}
-
-
-
-/* =====================================================
-   PROCESS SIDE
-===================================================== */
-
-async function processSide(
-    side,
-    file,
-    preview,
-    status,
-    editor,
-    cropCanvas,
-    tools
-){
-
-    status.style.display =
-        "block";
-
-
-    tools.style.display =
-        "none";
-
-
-    editor.style.display =
-        "none";
-
-
-    status.textContent =
-        "🔍 Finding your document…";
-
+    let src = null;
+    let dst = null;
+    let M = null;
 
     try{
 
-        const detection =
-            await autoDetect(file);
+        src = cv.imread(sourceCanvas);
+
+        const srcTri =
+            cv.matFromArray(
+                4,
+                1,
+                cv.CV_32FC2,
+                [
+                    tl.x,tl.y,
+                    tr.x,tr.y,
+                    br.x,br.y,
+                    bl.x,bl.y
+                ]
+            );
+
+        const dstTri =
+            cv.matFromArray(
+                4,
+                1,
+                cv.CV_32FC2,
+                [
+                    0,0,
+                    width,0,
+                    width,height,
+                    0,height
+                ]
+            );
+
+        M =
+            cv.getPerspectiveTransform(
+                srcTri,
+                dstTri
+            );
+
+        dst =
+            new cv.Mat();
+
+        cv.warpPerspective(
+            src,
+            dst,
+            M,
+            new cv.Size(width,height),
+            cv.INTER_CUBIC,
+            cv.BORDER_REPLICATE
+        );
+
+        const result =
+            document.createElement("canvas");
+
+        result.width = width;
+        result.height = height;
+
+        cv.imshow(
+            result,
+            dst
+        );
+
+        srcTri.delete();
+        dstTri.delete();
+
+        /*
+            =================================================
+            CRITICAL ORIENTATION FIX
+            =================================================
+
+            ID cards should be LANDSCAPE.
+
+            If the perspective result is portrait,
+            geometry is more reliable than OCR.
+
+            Therefore rotate it 90°.
+
+            OCR is then allowed ONLY to detect 180°.
+        */
+
+        let normalized = result;
+
+        if(
+            normalized.height >
+            normalized.width
+        ){
+            normalized =
+                rotateClockwise(normalized);
+        }
+
+        return await orientUpsideDownOnly(
+            normalized
+        );
+
+    }finally{
+
+        if(src) src.delete();
+        if(dst) dst.delete();
+        if(M) M.delete();
+    }
+}
 
 
-        if(side==="front"){
+/* =========================================================
+   IMAGE PROCESSING
+========================================================= */
 
-            frontSource =
-                detection.source;
+async function processSide(side,file){
+
+    showLoading("Detecting document…");
+
+    try{
+
+        const img =
+            await fileToImage(file);
+
+        const original =
+            imageToCanvas(img);
+
+        if(side==="front")
+            frontOriginal = original;
+        else
+            backOriginal = original;
+
+        const points =
+            detectDocument(original);
+
+        if(points){
+
+            showLoading(
+                "Straightening and orienting…"
+            );
+
+            const cropped =
+                await perspectiveCrop(
+                    original,
+                    points
+                );
+
+            if(side==="front")
+                frontCanvas = cropped;
+            else
+                backCanvas = cropped;
+
+            setPreview(
+                side,
+                cropped
+            );
+
+            setStatus(
+                side,
+                "Document detected, straightened and oriented."
+            );
 
         }else{
 
-            backSource =
-                detection.source;
+            /*
+                Automatic detection failed.
+                Show original and allow manual
+                corner adjustment.
+            */
 
-        }
+            if(side==="front")
+                frontCanvas = original;
+            else
+                backCanvas = original;
 
-
-        if(
-            detection.detected
-        ){
-
-            status.textContent =
-                "✨ Document found. Straightening…";
-
-
-            showLoading(
-                "Straightening your document…"
+            setPreview(
+                side,
+                original
             );
 
-
-            const result =
-                await perspectiveCrop(
-                    detection.source,
-                    detection.points
-                );
-
-
-            hideLoading();
-
-
-            if(side==="front"){
-
-                frontCanvas =
-                    result;
-
-            }else{
-
-                backCanvas =
-                    result;
-
-            }
-
-
-            showResult(
-                result,
-                preview,
-                status,
-                tools
+            setStatus(
+                side,
+                "Could not automatically detect the document. You can adjust the corners manually."
             );
-
-
-            makePdf.disabled =
-                false;
-
-
-            return;
-
         }
-
-
-        /*
-           Auto detection not confident enough.
-           Use manual only as fallback.
-        */
-
-        status.textContent =
-            "👆 Almost there — mark the four corners.";
-
-
-        createManualEditor(
-            side,
-            detection.source,
-            cropCanvas,
-            editor
-        );
-
 
     }catch(error){
 
         console.error(error);
 
+        setStatus(
+            side,
+            "Something went wrong while processing this photo."
+        );
+
+    }finally{
 
         hideLoading();
-
-
-        try{
-
-            const img =
-                await loadImage(file);
-
-
-            const source =
-                imageToCanvas(img);
-
-
-            if(side==="front"){
-
-                frontSource =
-                    source;
-
-            }else{
-
-                backSource =
-                    source;
-
-            }
-
-
-            status.textContent =
-                "👆 Mark the four corners of your document.";
-
-
-            createManualEditor(
-                side,
-                source,
-                cropCanvas,
-                editor
-            );
-
-        }catch{
-
-            status.textContent =
-                "❌ Could not process this image. Please try another photo.";
-
-        }
-
     }
-
 }
 
 
+/* =========================================================
+   FILE INPUTS
+========================================================= */
 
-/* =====================================================
-   FRONT UPLOAD
-===================================================== */
+document
+.getElementById("frontInput")
+.addEventListener("change",async function(){
 
-frontInput.addEventListener(
-    "change",
-    async function(){
+    if(!this.files || !this.files[0])
+        return;
 
-        const file =
-            frontInput.files[0];
-
-
-        if(!file){
-            return;
-        }
+    await processSide(
+        "front",
+        this.files[0]
+    );
+});
 
 
-        await processSide(
+document
+.getElementById("backInput")
+.addEventListener("change",async function(){
 
-            "front",
+    if(!this.files || !this.files[0])
+        return;
 
-            file,
+    await processSide(
+        "back",
+        this.files[0]
+    );
+});
 
-            frontPreview,
 
-            frontStatus,
+/* =========================================================
+   MANUAL ROTATION
+========================================================= */
 
-            frontEditor,
+function rotateFront(){
 
-            frontCropCanvas,
+    if(!frontCanvas)
+        return;
 
-            frontTools
+    frontCanvas =
+        rotateClockwise(frontCanvas);
 
+    frontRotation =
+        (frontRotation+90)%360;
+
+    setPreview(
+        "front",
+        frontCanvas
+    );
+}
+
+
+function rotateBack(){
+
+    if(!backCanvas)
+        return;
+
+    backCanvas =
+        rotateClockwise(backCanvas);
+
+    backRotation =
+        (backRotation+90)%360;
+
+    setPreview(
+        "back",
+        backCanvas
+    );
+}
+
+
+/* =========================================================
+   MANUAL FOUR-CORNER CROP
+========================================================= */
+
+function openManual(side){
+
+    currentManualSide = side;
+
+    const source =
+        side==="front"
+        ? frontOriginal
+        : backOriginal;
+
+    if(!source)
+        return;
+
+    const editor =
+        document.getElementById(
+            side+"Editor"
         );
 
-    }
-);
+    editor.classList.remove("hidden");
 
-
-
-/* =====================================================
-   BACK UPLOAD
-===================================================== */
-
-backInput.addEventListener(
-    "change",
-    async function(){
-
-        const file =
-            backInput.files[0];
-
-
-        if(!file){
-            return;
-        }
-
-
-        await processSide(
-
-            "back",
-
-            file,
-
-            backPreview,
-
-            backStatus,
-
-            backEditor,
-
-            backCropCanvas,
-
-            backTools
-
+    const canvas =
+        document.getElementById(
+            side+"Canvas"
         );
-
-    }
-);
-
-
-
-/* =====================================================
-   APPLY FRONT MANUAL CROP
-===================================================== */
-
-frontApply.addEventListener(
-    "click",
-    async function(){
-
-        const state =
-            manualStates.get(
-                "front"
-            );
-
-
-        if(!state){
-            return;
-        }
-
-
-        frontStatus.textContent =
-            "✂️ Straightening document…";
-
-
-        showLoading(
-            "Straightening your document…"
-        );
-
-
-        try{
-
-            const result =
-                await perspectiveCrop(
-                    state.source,
-                    state.points
-                );
-
-
-            frontCanvas =
-                result;
-
-
-            frontEditor.style.display =
-                "none";
-
-
-            showResult(
-                result,
-                frontPreview,
-                frontStatus,
-                frontTools
-            );
-
-
-            makePdf.disabled =
-                false;
-
-        }finally{
-
-            hideLoading();
-
-        }
-
-    }
-);
-
-
-
-/* =====================================================
-   APPLY BACK MANUAL CROP
-===================================================== */
-
-backApply.addEventListener(
-    "click",
-    async function(){
-
-        const state =
-            manualStates.get(
-                "back"
-            );
-
-
-        if(!state){
-            return;
-        }
-
-
-        backStatus.textContent =
-            "✂️ Straightening document…";
-
-
-        showLoading(
-            "Straightening your document…"
-        );
-
-
-        try{
-
-            const result =
-                await perspectiveCrop(
-                    state.source,
-                    state.points
-                );
-
-
-            backCanvas =
-                result;
-
-
-            backEditor.style.display =
-                "none";
-
-
-            showResult(
-                result,
-                backPreview,
-                backStatus,
-                backTools
-            );
-
-
-            makePdf.disabled =
-                false;
-
-        }finally{
-
-            hideLoading();
-
-        }
-
-    }
-);
-
-
-
-/* =====================================================
-   ADJUST FRONT
-===================================================== */
-
-frontFix.addEventListener(
-    "click",
-    function(){
-
-        if(!frontSource){
-            return;
-        }
-
-
-        frontStatus.textContent =
-            "✂️ Adjust the four corners.";
-
-
-        createManualEditor(
-
-            "front",
-
-            frontSource,
-
-            frontCropCanvas,
-
-            frontEditor
-
-        );
-
-    }
-);
-
-
-
-/* =====================================================
-   ADJUST BACK
-===================================================== */
-
-backFix.addEventListener(
-    "click",
-    function(){
-
-        if(!backSource){
-            return;
-        }
-
-
-        backStatus.textContent =
-            "✂️ Adjust the four corners.";
-
-
-        createManualEditor(
-
-            "back",
-
-            backSource,
-
-            backCropCanvas,
-
-            backEditor
-
-        );
-
-    }
-);
-
-
-
-/* =====================================================
-   ROTATE FRONT
-===================================================== */
-
-frontRotate.addEventListener(
-    "click",
-    function(){
-
-        if(!frontCanvas){
-            return;
-        }
-
-
-        frontCanvas =
-            rotateClockwise(
-                frontCanvas
-            );
-
-
-        frontPreview.src =
-            frontCanvas.toDataURL(
-                "image/jpeg",
-                0.95
-            );
-
-    }
-);
-
-
-
-/* =====================================================
-   ROTATE BACK
-===================================================== */
-
-backRotate.addEventListener(
-    "click",
-    function(){
-
-        if(!backCanvas){
-            return;
-        }
-
-
-        backCanvas =
-            rotateClockwise(
-                backCanvas
-            );
-
-
-        backPreview.src =
-            backCanvas.toDataURL(
-                "image/jpeg",
-                0.95
-            );
-
-    }
-);
-
-
-
-/* =====================================================
-   ADD IMAGE TO PDF
-===================================================== */
-
-function addToPdf(
-    pdf,
-    canvas,
-    y
-){
-
-    const pageWidth =
-        210;
-
-
-    const margin =
-        15;
-
 
     const maxWidth =
-        pageWidth -
-        margin*2;
-
-
-    const maxHeight =
-        112;
-
-
-    let width =
-        canvas.width;
-
-
-    let height =
-        canvas.height;
-
+        editor.clientWidth || 580;
 
     const scale =
         Math.min(
-            maxWidth/width,
-            maxHeight/height
+            1,
+            maxWidth/source.width
         );
 
+    canvas.width =
+        Math.round(source.width*scale);
 
-    width *= scale;
+    canvas.height =
+        Math.round(source.height*scale);
 
-    height *= scale;
+    const ctx =
+        canvas.getContext("2d");
 
-
-    const x =
-        (pageWidth-width)/2;
-
-
-    pdf.addImage(
-
-        canvas.toDataURL(
-            "image/jpeg",
-            0.95
-        ),
-
-        "JPEG",
-
-        x,
-
-        y,
-
-        width,
-
-        height
-
+    ctx.drawImage(
+        source,
+        0,
+        0,
+        canvas.width,
+        canvas.height
     );
 
+    /*
+        Initial corners.
+    */
 
-    return y+height;
+    const marginX =
+        canvas.width*0.08;
 
+    const marginY =
+        canvas.height*0.12;
+
+    const corners = [
+
+        {
+            x:marginX,
+            y:marginY
+        },
+
+        {
+            x:canvas.width-marginX,
+            y:marginY
+        },
+
+        {
+            x:canvas.width-marginX,
+            y:canvas.height-marginY
+        },
+
+        {
+            x:marginX,
+            y:canvas.height-marginY
+        }
+    ];
+
+    corners.forEach((p,index)=>{
+
+        const el =
+            document.getElementById(
+                side+"C"+(index+1)
+            );
+
+        el.style.left =
+            p.x+"px";
+
+        el.style.top =
+            p.y+"px";
+
+        makeDraggable(
+            el,
+            canvas,
+            side
+        );
+    });
 }
 
 
+function makeDraggable(el,canvas,side){
 
-/* =====================================================
-   CREATE PDF
-===================================================== */
+    let dragging = false;
 
-makePdf.addEventListener(
-    "click",
-    function(){
+    function move(clientX,clientY){
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+        let x =
+            clientX-rect.left;
+
+        let y =
+            clientY-rect.top;
+
+        x =
+            Math.max(
+                0,
+                Math.min(
+                    canvas.width,
+                    x
+                )
+            );
+
+        y =
+            Math.max(
+                0,
+                Math.min(
+                    canvas.height,
+                    y
+                )
+            );
+
+        el.style.left =
+            x+"px";
+
+        el.style.top =
+            y+"px";
+    }
+
+    el.addEventListener(
+        "pointerdown",
+        e=>{
+            dragging=true;
+            el.setPointerCapture(
+                e.pointerId
+            );
+        }
+    );
+
+    el.addEventListener(
+        "pointermove",
+        e=>{
+            if(!dragging)
+                return;
+
+            move(
+                e.clientX,
+                e.clientY
+            );
+        }
+    );
+
+    el.addEventListener(
+        "pointerup",
+        ()=>{
+            dragging=false;
+        }
+    );
+}
+
+
+async function applyManual(side){
+
+    const canvas =
+        document.getElementById(
+            side+"Canvas"
+        );
+
+    const points=[];
+
+    for(let i=1;i<=4;i++){
+
+        const el =
+            document.getElementById(
+                side+"C"+i
+            );
+
+        points.push({
+            x:parseFloat(el.style.left),
+            y:parseFloat(el.style.top)
+        });
+    }
+
+    /*
+        Convert editor coordinates back
+        to original image coordinates.
+    */
+
+    const original =
+        side==="front"
+        ? frontOriginal
+        : backOriginal;
+
+    const scaleX =
+        original.width/canvas.width;
+
+    const scaleY =
+        original.height/canvas.height;
+
+    const originalPoints =
+        points.map(p=>({
+            x:p.x*scaleX,
+            y:p.y*scaleY
+        }));
+
+    showLoading(
+        "Applying crop…"
+    );
+
+    try{
+
+        const cropped =
+            await perspectiveCrop(
+                original,
+                originalPoints
+            );
+
+        if(side==="front")
+            frontCanvas = cropped;
+        else
+            backCanvas = cropped;
+
+        setPreview(
+            side,
+            cropped
+        );
+
+        setStatus(
+            side,
+            "Document cropped and oriented."
+        );
+
+        document
+            .getElementById(
+                side+"Editor"
+            )
+            .classList.add("hidden");
+
+    }catch(error){
+
+        console.error(error);
+
+        setStatus(
+            side,
+            "Could not apply the crop."
+        );
+
+    }finally{
+
+        hideLoading();
+    }
+}
+
+
+/* =========================================================
+   A4 PDF
+========================================================= */
+
+function drawDocumentOnA4(
+    doc,
+    canvas,
+    x,
+    y,
+    maxWidth,
+    maxHeight
+){
+
+    const imgRatio =
+        canvas.width/canvas.height;
+
+    let width =
+        maxWidth;
+
+    let height =
+        width/imgRatio;
+
+    if(height>maxHeight){
+
+        height =
+            maxHeight;
+
+        width =
+            height*imgRatio;
+    }
+
+    /*
+        Center horizontally.
+    */
+
+    const finalX =
+        x+(maxWidth-width)/2;
+
+    doc.addImage(
+        canvas.toDataURL(
+            "image/jpeg",
+            0.94
+        ),
+        "JPEG",
+        finalX,
+        y,
+        width,
+        height
+    );
+}
+
+
+document
+.getElementById("createPdf")
+.addEventListener("click",function(){
+
+    if(!frontCanvas){
+
+        alert(
+            "Please add the front-side photo first."
+        );
+
+        return;
+    }
+
+    showLoading(
+        "Creating A4 PDF…"
+    );
+
+    setTimeout(()=>{
 
         try{
 
-            makePdf.disabled =
-                true;
-
-
-            makePdf.textContent =
-                "Creating PDF…";
-
-
             const {
                 jsPDF
-            } =
-                window.jspdf;
+            } = window.jspdf;
 
-
-            const pdf =
+            const doc =
                 new jsPDF({
-
-                    orientation:
-                        "portrait",
-
-                    unit:
-                        "mm",
-
-                    format:
-                        "a4"
-
+                    orientation:"portrait",
+                    unit:"mm",
+                    format:"a4"
                 });
 
+            const pageWidth =
+                210;
 
-            let y =
-                18;
+            const pageHeight =
+                297;
 
+            const margin =
+                10;
 
-            if(frontCanvas){
+            const availableWidth =
+                pageWidth-margin*2;
 
-                y =
-                    addToPdf(
-                        pdf,
-                        frontCanvas,
-                        y
-                    );
+            /*
+                If both sides exist:
+                place them one above another.
 
+                If only front exists:
+                use more vertical space.
+            */
 
-                y += 12;
+            if(frontCanvas && backCanvas){
 
-            }
+                const gap = 8;
 
+                const areaHeight =
+                    (pageHeight-
+                     margin*2-
+                     gap)/2;
 
-            if(backCanvas){
-
-                addToPdf(
-                    pdf,
-                    backCanvas,
-                    y
+                drawDocumentOnA4(
+                    doc,
+                    frontCanvas,
+                    margin,
+                    margin,
+                    availableWidth,
+                    areaHeight
                 );
 
+                drawDocumentOnA4(
+                    doc,
+                    backCanvas,
+                    margin,
+                    margin+
+                    areaHeight+
+                    gap,
+                    availableWidth,
+                    areaHeight
+                );
+
+            }else{
+
+                drawDocumentOnA4(
+                    doc,
+                    frontCanvas,
+                    margin,
+                    margin,
+                    availableWidth,
+                    pageHeight-margin*2
+                );
             }
 
-
-            pdf.save(
-                "printready-document.pdf"
+            doc.save(
+                "PrintReady-A4.pdf"
             );
-
-
-            success.style.display =
-                "block";
-
-
-            again.style.display =
-                "block";
-
-
-            makePdf.textContent =
-                "PDF Created ✓";
-
 
         }catch(error){
 
             console.error(error);
 
-
             alert(
-                "Something went wrong. Please try again."
+                "Could not create the PDF."
             );
 
+        }finally{
 
-            makePdf.disabled =
-                false;
-
-
-            makePdf.textContent =
-                "Create A4 PDF";
-
+            hideLoading();
         }
 
-    }
-);
+    },100);
+});
 
 
+/* =========================================================
+   OPENCV READY
+========================================================= */
 
-/* =====================================================
-   CREATE ANOTHER
-===================================================== */
+if(typeof cv !== "undefined"){
 
-again.addEventListener(
-    "click",
-    function(){
+    cv["onRuntimeInitialized"] = function(){
 
-        location.reload();
-
-    }
-);
-
-
-
-/* =====================================================
-   CLEANUP OCR WORKER
-===================================================== */
-
-window.addEventListener(
-    "pagehide",
-    async function(){
-
-        if(
-            orientationWorker
-        ){
-
-            try{
-
-                await orientationWorker.terminate();
-
-            }catch{}
-
-        }
-
-    }
-);
+        console.log(
+            "OpenCV ready."
+        );
+    };
+}
 
 </script>
 
 </body>
-
 </html>
