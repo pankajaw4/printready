@@ -546,6 +546,90 @@ async function orientUpsideDownOnly(canvas){
 
         const worker = await getOrientationWorker();
 
+        /*
+            Let Tesseract perform the actual
+            automatic rotation instead of merely
+            reporting an orientation angle.
+        */
+
+        const result = await worker.recognize(
+            canvas,
+            {
+                rotateAuto:true
+            },
+            {
+                text:false,
+                blocks:false,
+                hocr:false,
+                tsv:false,
+                box:false,
+                unlv:false,
+                osd:true,
+                imageColor:true,
+                imageGrey:false,
+                imageBinary:false,
+                pdf:false,
+                debug:false
+            }
+        );
+
+        /*
+            Tesseract returns the corrected image.
+        */
+
+        if(
+            result &&
+            result.data &&
+            result.data.imageColor
+        ){
+
+            const corrected =
+                await imageDataToCanvas(
+                    result.data.imageColor
+                );
+
+            /*
+                Final safety check:
+                ID cards must remain landscape.
+            */
+
+            if(
+                corrected.height >
+                corrected.width
+            ){
+                return rotateClockwise(
+                    corrected
+                );
+            }
+
+            return corrected;
+        }
+
+        return canvas;
+
+    }catch(error){
+
+        console.warn(
+            "Automatic orientation unavailable:",
+            error
+        );
+
+        /*
+            Never break the document if OCR fails.
+        */
+
+        if(canvas.height > canvas.width){
+            return rotateClockwise(canvas);
+        }
+
+        return canvas;
+    }
+}
+
+    try{
+
+        const worker = await getOrientationWorker();
+
         const result = await worker.detect(canvas);
 
         const data =
