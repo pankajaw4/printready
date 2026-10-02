@@ -11,18 +11,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-
 let cvReadyResolve;
 
-const cvReady = new Promise(function(resolve){
+const cvReady = new Promise(resolve => {
     cvReadyResolve = resolve;
 });
 
 function onOpenCvReady(){
 
-    if(typeof cv === "undefined"){
-        return;
-    }
+    if(typeof cv === "undefined") return;
 
     if(cv.Mat){
 
@@ -37,7 +34,6 @@ function onOpenCvReady(){
     }
 
 }
-
 </script>
 
 <script
@@ -168,6 +164,12 @@ button{
     color:white;
 }
 
+.fix{
+    background:#fff4d6;
+    color:#8a5a00;
+    margin-top:10px;
+}
+
 button:disabled{
     opacity:.45;
 }
@@ -223,14 +225,8 @@ button:disabled{
     font-size:15px;
 }
 
-.result-tools{
+.tools{
     display:none;
-    margin-top:10px;
-}
-
-.fix-button{
-    background:#fff4d6;
-    color:#8a5a00;
     margin-top:10px;
 }
 
@@ -273,7 +269,6 @@ Front side
     id="front"
     type="file"
     accept="image/*"
-    capture="environment"
 >
 
 <img
@@ -326,11 +321,11 @@ Front side
 
 <div
     id="frontTools"
-    class="result-tools">
+    class="tools">
 
     <button
         id="frontFix"
-        class="fix-button small-button">
+        class="fix small-button">
 
         ✂️ Adjust corners
 
@@ -361,7 +356,6 @@ Back side
     id="back"
     type="file"
     accept="image/*"
-    capture="environment"
 >
 
 <img
@@ -414,11 +408,11 @@ Back side
 
 <div
     id="backTools"
-    class="result-tools">
+    class="tools">
 
     <button
         id="backFix"
-        class="fix-button small-button">
+        class="fix small-button">
 
         ✂️ Adjust corners
 
@@ -447,7 +441,6 @@ They are not uploaded to a PrintReady server.
 </div>
 
 
-
 <!-- PDF -->
 
 <div class="card">
@@ -457,8 +450,7 @@ They are not uploaded to a PrintReady server.
 <p class="note">
 
 PrintReady automatically detects, crops and straightens
-your document. Manual adjustment is available only when
-needed.
+your document. Manual adjustment is available only when needed.
 
 </p>
 
@@ -494,7 +486,6 @@ Create Another
 </div>
 
 
-
 <div class="card">
 
 <h2>PrintReady</h2>
@@ -513,7 +504,6 @@ other documents that need to be printed neatly.
 </main>
 
 
-
 <script>
 
 
@@ -521,29 +511,17 @@ other documents that need to be printed neatly.
    ELEMENTS
 ===================================================== */
 
-const frontInput =
-    document.getElementById("front");
+const frontInput = document.getElementById("front");
+const backInput = document.getElementById("back");
 
-const backInput =
-    document.getElementById("back");
+const frontPreview = document.getElementById("frontPreview");
+const backPreview = document.getElementById("backPreview");
 
-const frontPreview =
-    document.getElementById("frontPreview");
+const frontStatus = document.getElementById("frontStatus");
+const backStatus = document.getElementById("backStatus");
 
-const backPreview =
-    document.getElementById("backPreview");
-
-const frontStatus =
-    document.getElementById("frontStatus");
-
-const backStatus =
-    document.getElementById("backStatus");
-
-const frontEditor =
-    document.getElementById("frontEditor");
-
-const backEditor =
-    document.getElementById("backEditor");
+const frontEditor = document.getElementById("frontEditor");
+const backEditor = document.getElementById("backEditor");
 
 const frontCropCanvas =
     document.getElementById("frontCropCanvas");
@@ -557,17 +535,17 @@ const frontApply =
 const backApply =
     document.getElementById("backApply");
 
-const frontRotate =
-    document.getElementById("frontRotate");
-
-const backRotate =
-    document.getElementById("backRotate");
-
 const frontFix =
     document.getElementById("frontFix");
 
 const backFix =
     document.getElementById("backFix");
+
+const frontRotate =
+    document.getElementById("frontRotate");
+
+const backRotate =
+    document.getElementById("backRotate");
 
 const frontTools =
     document.getElementById("frontTools");
@@ -586,19 +564,12 @@ const success =
 
 
 let frontCanvas = null;
-
 let backCanvas = null;
 
-
-/*
-   Keep original source images.
-   Needed if the user wants to
-   manually adjust the automatic crop.
-*/
-
 let frontSource = null;
-
 let backSource = null;
+
+const manualStates = new Map();
 
 
 /* =====================================================
@@ -609,21 +580,15 @@ function loadImage(file){
 
     return new Promise(function(resolve,reject){
 
-        const img =
-            new Image();
+        const img = new Image();
 
-        img.onload =
-            function(){
+        img.onload = function(){
+            resolve(img);
+        };
 
-                resolve(img);
+        img.onerror = reject;
 
-            };
-
-        img.onerror =
-            reject;
-
-        img.src =
-            URL.createObjectURL(file);
+        img.src = URL.createObjectURL(file);
 
     });
 
@@ -631,13 +596,12 @@ function loadImage(file){
 
 
 /* =====================================================
-   IMAGE → WORKING CANVAS
+   IMAGE TO CANVAS
 ===================================================== */
 
 function imageToCanvas(img){
 
-    const maximum =
-        1800;
+    const maximum = 1800;
 
     let width =
         img.naturalWidth || img.width;
@@ -649,8 +613,7 @@ function imageToCanvas(img){
     const scale =
         Math.min(
             1,
-            maximum /
-            Math.max(width,height)
+            maximum / Math.max(width,height)
         );
 
 
@@ -665,11 +628,8 @@ function imageToCanvas(img){
         document.createElement("canvas");
 
 
-    canvas.width =
-        width;
-
-    canvas.height =
-        height;
+    canvas.width = width;
+    canvas.height = height;
 
 
     canvas
@@ -708,60 +668,130 @@ function distance(a,b){
 
 function orderPoints(points){
 
-    const sorted =
-        points.slice().sort(function(a,b){
+    const result = {
 
-            return (
-                (a.x+a.y) -
-                (b.x+b.y)
-            );
+        tl:null,
+        tr:null,
+        br:null,
+        bl:null
 
-        });
-
-
-    const tl =
-        sorted[0];
-
-    const br =
-        sorted[sorted.length-1];
+    };
 
 
-    const remaining =
-        sorted.slice(1,3);
+    let minSum = Infinity;
+    let maxSum = -Infinity;
+
+    let minDiff = Infinity;
+    let maxDiff = -Infinity;
 
 
-    remaining.sort(function(a,b){
+    points.forEach(function(p){
 
-        return a.x-b.x;
+        const sum = p.x+p.y;
+        const diff = p.x-p.y;
+
+
+        if(sum < minSum){
+
+            minSum = sum;
+            result.tl = p;
+
+        }
+
+
+        if(sum > maxSum){
+
+            maxSum = sum;
+            result.br = p;
+
+        }
+
+
+        if(diff > maxDiff){
+
+            maxDiff = diff;
+            result.tr = p;
+
+        }
+
+
+        if(diff < minDiff){
+
+            minDiff = diff;
+            result.bl = p;
+
+        }
 
     });
 
 
-    const bl =
-        remaining[0];
-
-    const tr =
-        remaining[1];
-
-
     return [
-        tl,
-        tr,
-        br,
-        bl
+        result.tl,
+        result.tr,
+        result.br,
+        result.bl
     ];
 
 }
 
 
 /* =====================================================
-   CHECK RECTANGLE QUALITY
+   POLYGON AREA
+===================================================== */
+
+function polygonArea(points){
+
+    let area = 0;
+
+
+    for(
+        let i=0;
+        i<points.length;
+        i++
+    ){
+
+        const j =
+            (i+1) %
+            points.length;
+
+
+        area +=
+            points[i].x *
+            points[j].y;
+
+
+        area -=
+            points[j].x *
+            points[i].y;
+
+    }
+
+
+    return Math.abs(area/2);
+
+}
+
+
+/* =====================================================
+   RECTANGLE QUALITY
 ===================================================== */
 
 function rectangleQuality(points){
 
     const p =
         orderPoints(points);
+
+
+    if(
+        !p[0] ||
+        !p[1] ||
+        !p[2] ||
+        !p[3]
+    ){
+
+        return null;
+
+    }
 
 
     const top =
@@ -802,8 +832,8 @@ function rectangleQuality(points){
 
 
     /*
-       ID cards normally sit around
-       1.4–1.9 in their long/short ratio.
+       Broad enough for ID cards,
+       but rejects portrait photos.
     */
 
     if(
@@ -815,12 +845,6 @@ function rectangleQuality(points){
 
     }
 
-
-    /*
-       Compare opposite sides.
-       A real rectangle should have
-       reasonably similar opposite sides.
-    */
 
     const widthBalance =
         Math.min(top,bottom) /
@@ -858,43 +882,125 @@ function rectangleQuality(points){
 
 
 /* =====================================================
-   QUADRILATERAL AREA
+   ADD CANDIDATE
 ===================================================== */
 
-function polygonArea(points){
+function addCandidate(
+    candidates,
+    points,
+    imageArea
+){
 
-    let area = 0;
-
-    for(
-        let i=0;
-        i<points.length;
-        i++
-    ){
-
-        const j =
-            (i+1) %
-            points.length;
+    const quality =
+        rectangleQuality(points);
 
 
-        area +=
-            points[i].x *
-            points[j].y;
+    if(!quality) return;
 
 
-        area -=
-            points[j].x *
-            points[i].y;
+    const area =
+        polygonArea(
+            quality.points
+        );
+
+
+    const areaRatio =
+        area/imageArea;
+
+
+    /*
+       The important protection against
+       detecting the small portrait inside
+       the Aadhaar.
+    */
+
+    if(areaRatio < 0.10){
+
+        return;
 
     }
 
 
-    return Math.abs(area/2);
+    if(areaRatio > 0.92){
+
+        return;
+
+    }
+
+
+    let score =
+        areaRatio * 100;
+
+
+    /*
+       Strong preference for larger cards.
+    */
+
+    if(areaRatio >= 0.20){
+
+        score *= 1.25;
+
+    }
+
+
+    if(areaRatio >= 0.30){
+
+        score *= 1.20;
+
+    }
+
+
+    /*
+       Penalize small internal rectangles.
+    */
+
+    if(areaRatio < 0.16){
+
+        score *= 0.25;
+
+    }
+
+
+    /*
+       Prefer normal ID-card proportions.
+    */
+
+    const ratioDifference =
+        Math.abs(
+            quality.ratio - 1.586
+        );
+
+
+    score +=
+        Math.max(
+            0,
+            15 - ratioDifference*15
+        );
+
+
+    candidates.push({
+
+        points:quality.points,
+
+        width:quality.width,
+
+        height:quality.height,
+
+        area:area,
+
+        areaRatio:areaRatio,
+
+        ratio:quality.ratio,
+
+        score:score
+
+    });
 
 }
 
 
 /* =====================================================
-   AUTOMATIC DOCUMENT DETECTION
+   AUTO DETECT
 ===================================================== */
 
 async function autoDetect(file){
@@ -926,19 +1032,14 @@ async function autoDetect(file){
 
 
     const imageArea =
-        src.cols *
-        src.rows;
+        src.cols*src.rows;
 
 
-    let candidates = [];
+    const candidates = [];
 
 
     /*
-       We deliberately run several
-       edge passes.
-
-       This is much more reliable than
-       trusting one Canny threshold.
+       Multiple edge passes.
     */
 
     const passes = [
@@ -1030,38 +1131,12 @@ async function autoDetect(file){
                 );
 
 
-            /*
-               VERY IMPORTANT:
-
-               Ignore small internal objects.
-
-               The previous version was selecting
-               the portrait photograph inside Aadhaar.
-            */
-
             if(
-                area <
-                imageArea * 0.10
+                area < imageArea*0.10 ||
+                area > imageArea*0.92
             ){
 
                 contour.delete();
-
-                continue;
-
-            }
-
-
-            /*
-               Also ignore almost-the-whole-photo.
-            */
-
-            if(
-                area >
-                imageArea * 0.92
-            ){
-
-                contour.delete();
-
                 continue;
 
             }
@@ -1081,17 +1156,16 @@ async function autoDetect(file){
             cv.approxPolyDP(
                 contour,
                 approx,
-                0.02 *
-                perimeter,
+                0.02*perimeter,
                 true
             );
 
 
             if(
-                approx.rows === 4
+                approx.rows===4
             ){
 
-                const points = [];
+                const points=[];
 
 
                 for(
@@ -1103,104 +1177,21 @@ async function autoDetect(file){
                     points.push({
 
                         x:
-                            approx.data32S[
-                                j*2
-                            ],
+                            approx.data32S[j*2],
 
                         y:
-                            approx.data32S[
-                                j*2+1
-                            ]
+                            approx.data32S[j*2+1]
 
                     });
 
                 }
 
 
-                const quality =
-                    rectangleQuality(
-                        points
-                    );
-
-
-                if(quality){
-
-                    const candidateArea =
-                        polygonArea(
-                            quality.points
-                        );
-
-
-                    const areaRatio =
-                        candidateArea /
-                        imageArea;
-
-
-                    /*
-                       Score:
-
-                       - Bigger document = better
-                       - Card-like ratio = better
-                       - Prefer candidates occupying
-                         meaningful part of photo
-                    */
-
-                    let score =
-                        areaRatio * 100;
-
-
-                    /*
-                       Penalize suspiciously small
-                       candidates.
-
-                       A portrait photo inside Aadhaar
-                       should lose badly here.
-                    */
-
-                    if(
-                        areaRatio < 0.16
-                    ){
-
-                        score *= 0.35;
-
-                    }
-
-
-                    if(
-                        areaRatio >= 0.20
-                    ){
-
-                        score *= 1.15;
-
-                    }
-
-
-                    candidates.push({
-
-                        points:
-                            quality.points,
-
-                        width:
-                            quality.width,
-
-                        height:
-                            quality.height,
-
-                        ratio:
-                            quality.ratio,
-
-                        area:
-                            candidateArea,
-
-                        areaRatio:
-                            areaRatio,
-
-                        score:
-                            score
-
-                    });
-
-                }
+                addCandidate(
+                    candidates,
+                    points,
+                    imageArea
+                );
 
             }
 
@@ -1221,23 +1212,16 @@ async function autoDetect(file){
 
 
     /*
-       BRIGHT DOCUMENT PASS
-
-       Useful for white ID cards sitting
-       on darker backgrounds.
+       Bright-card detection.
     */
 
-    const thresholdValues = [
-        110,
-        140,
-        170,
-        200
-    ];
+    const thresholds =
+        [110,140,170,200];
 
 
     for(
         let t=0;
-        t<thresholdValues.length;
+        t<thresholds.length;
         t++
     ){
 
@@ -1248,7 +1232,7 @@ async function autoDetect(file){
         cv.threshold(
             gray,
             binary,
-            thresholdValues[t],
+            thresholds[t],
             255,
             cv.THRESH_BINARY
         );
@@ -1305,24 +1289,11 @@ async function autoDetect(file){
 
 
             if(
-                area <
-                imageArea*0.10
+                area < imageArea*0.10 ||
+                area > imageArea*0.92
             ){
 
                 contour.delete();
-
-                continue;
-
-            }
-
-
-            if(
-                area >
-                imageArea*0.92
-            ){
-
-                contour.delete();
-
                 continue;
 
             }
@@ -1363,87 +1334,21 @@ async function autoDetect(file){
                     points.push({
 
                         x:
-                            approx.data32S[
-                                j*2
-                            ],
+                            approx.data32S[j*2],
 
                         y:
-                            approx.data32S[
-                                j*2+1
-                            ]
+                            approx.data32S[j*2+1]
 
                     });
 
                 }
 
 
-                const quality =
-                    rectangleQuality(
-                        points
-                    );
-
-
-                if(quality){
-
-                    const candidateArea =
-                        polygonArea(
-                            quality.points
-                        );
-
-
-                    const areaRatio =
-                        candidateArea /
-                        imageArea;
-
-
-                    let score =
-                        areaRatio*100;
-
-
-                    if(
-                        areaRatio<0.16
-                    ){
-
-                        score*=0.35;
-
-                    }
-
-
-                    if(
-                        areaRatio>=0.20
-                    ){
-
-                        score*=1.15;
-
-                    }
-
-
-                    candidates.push({
-
-                        points:
-                            quality.points,
-
-                        width:
-                            quality.width,
-
-                        height:
-                            quality.height,
-
-                        ratio:
-                            quality.ratio,
-
-                        area:
-                            candidateArea,
-
-                        areaRatio:
-                            areaRatio,
-
-                        score:
-                            score
-
-                    });
-
-                }
+                addCandidate(
+                    candidates,
+                    points,
+                    imageArea
+                );
 
             }
 
@@ -1467,14 +1372,13 @@ async function autoDetect(file){
 
 
     /*
-       Pick the strongest candidate.
+       Sort candidates.
     */
 
-    candidates.sort(function(a,b){
-
-        return b.score-a.score;
-
-    });
+    candidates.sort(
+        (a,b) =>
+            b.score-a.score
+    );
 
 
     const best =
@@ -1486,16 +1390,14 @@ async function autoDetect(file){
     /*
        Confidence gate.
 
-       If the system is not sufficiently
-       confident, DO NOT create a wrong crop.
-
-       Instead, show the manual fallback.
+       We would rather ask for four corners
+       than produce a wrong document.
     */
 
     const confident =
         best &&
-        best.areaRatio >= 0.12 &&
-        best.score >= 8;
+        best.areaRatio >= 0.16 &&
+        best.score >= 20;
 
 
     return {
@@ -1507,24 +1409,53 @@ async function autoDetect(file){
         points:
             confident
             ? best.points
-            : null,
-
-        width:
-            confident
-            ? best.width
-            : 0,
-
-        height:
-            confident
-            ? best.height
-            : 0,
-
-        confidence:
-            confident
-            ? best.score
-            : 0
+            : null
 
     };
+
+}
+
+
+/* =====================================================
+   ROTATE CLOCKWISE
+===================================================== */
+
+function rotateClockwise(canvas){
+
+    const output =
+        document.createElement("canvas");
+
+
+    output.width =
+        canvas.height;
+
+    output.height =
+        canvas.width;
+
+
+    const ctx =
+        output.getContext("2d");
+
+
+    ctx.translate(
+        output.width,
+        0
+    );
+
+
+    ctx.rotate(
+        Math.PI/2
+    );
+
+
+    ctx.drawImage(
+        canvas,
+        0,
+        0
+    );
+
+
+    return output;
 
 }
 
@@ -1573,35 +1504,25 @@ async function perspectiveCrop(
         );
 
 
-    const width =
-        Math.max(
-            topWidth,
-            bottomWidth
-        );
-
-
-    const height =
-        Math.max(
-            leftHeight,
-            rightHeight
-        );
-
-
-    /*
-       Preserve the detected card's
-       actual orientation.
-    */
-
     let outputWidth =
         Math.round(
-            width
+            Math.max(
+                topWidth,
+                bottomWidth
+            )
         );
 
 
     let outputHeight =
         Math.round(
-            height
+            Math.max(
+                leftHeight,
+                rightHeight
+            )
         );
+
+
+    const maxSize = 1600;
 
 
     const longest =
@@ -1611,14 +1532,10 @@ async function perspectiveCrop(
         );
 
 
-    const target =
-        1600;
-
-
-    if(longest>target){
+    if(longest>maxSize){
 
         const scale =
-            target/longest;
+            maxSize/longest;
 
 
         outputWidth =
@@ -1734,11 +1651,7 @@ async function perspectiveCrop(
 
 
     /*
-       ID cards should normally be
-       landscape.
-
-       If result is portrait,
-       rotate it automatically.
+       Cards should normally be landscape.
     */
 
     if(
@@ -1754,50 +1667,6 @@ async function perspectiveCrop(
 
 
     return result;
-
-}
-
-
-/* =====================================================
-   ROTATE CLOCKWISE
-===================================================== */
-
-function rotateClockwise(canvas){
-
-    const output =
-        document.createElement("canvas");
-
-
-    output.width =
-        canvas.height;
-
-    output.height =
-        canvas.width;
-
-
-    const ctx =
-        output.getContext("2d");
-
-
-    ctx.translate(
-        output.width,
-        0
-    );
-
-
-    ctx.rotate(
-        Math.PI/2
-    );
-
-
-    ctx.drawImage(
-        canvas,
-        0,
-        0
-    );
-
-
-    return output;
 
 }
 
@@ -1839,15 +1708,7 @@ function showResult(
 
 
 /* =====================================================
-   MANUAL CROP STATES
-===================================================== */
-
-const manualStates =
-    new Map();
-
-
-/* =====================================================
-   DRAW MANUAL EDITOR
+   MANUAL EDITOR
 ===================================================== */
 
 function drawManualEditor(state){
@@ -1880,7 +1741,7 @@ function drawManualEditor(state){
 
 
     /*
-       Dark outside area.
+       Dark outside overlay.
     */
 
     ctx.fillStyle =
@@ -1927,7 +1788,7 @@ function drawManualEditor(state){
 
 
     /*
-       Blue crop outline.
+       Outline.
     */
 
     ctx.beginPath();
@@ -1937,24 +1798,20 @@ function drawManualEditor(state){
         p[0].y
     );
 
-
     ctx.lineTo(
         p[1].x,
         p[1].y
     );
-
 
     ctx.lineTo(
         p[2].x,
         p[2].y
     );
 
-
     ctx.lineTo(
         p[3].x,
         p[3].y
     );
-
 
     ctx.closePath();
 
@@ -1973,7 +1830,7 @@ function drawManualEditor(state){
 
 
     /*
-       Corner handles.
+       Handles.
     */
 
     p.forEach(function(point,index){
@@ -2044,11 +1901,11 @@ function createManualEditor(
 ){
 
     const marginX =
-        source.width*0.12;
+        source.width*0.10;
 
 
     const marginY =
-        source.height*0.12;
+        source.height*0.10;
 
 
     const state = {
@@ -2095,7 +1952,6 @@ function createManualEditor(
     canvas.width =
         source.width;
 
-
     canvas.height =
         source.height;
 
@@ -2115,27 +1971,17 @@ function createManualEditor(
             canvas.getBoundingClientRect();
 
 
-        const scaleX =
-            canvas.width /
-            rect.width;
-
-
-        const scaleY =
-            canvas.height /
-            rect.height;
-
-
         return {
 
             x:
-                (event.clientX-
-                rect.left)*
-                scaleX,
+                (event.clientX-rect.left) *
+                canvas.width /
+                rect.width,
 
             y:
-                (event.clientY-
-                rect.top)*
-                scaleY
+                (event.clientY-rect.top) *
+                canvas.height /
+                rect.height
 
         };
 
@@ -2149,12 +1995,8 @@ function createManualEditor(
                 getPoint(event);
 
 
-            let nearest =
-                -1;
-
-
-            let nearestDistance =
-                Infinity;
+            let nearest = -1;
+            let nearestDistance = Infinity;
 
 
             state.points.forEach(
@@ -2254,8 +2096,7 @@ function createManualEditor(
     canvas.onpointerup =
         function(){
 
-            state.active =
-                -1;
+            state.active = -1;
 
         };
 
@@ -2263,8 +2104,7 @@ function createManualEditor(
     canvas.onpointercancel =
         function(){
 
-            state.active =
-                -1;
+            state.active = -1;
 
         };
 
@@ -2272,33 +2112,7 @@ function createManualEditor(
 
 
 /* =====================================================
-   OPEN MANUAL EDITOR FROM AUTOMATIC RESULT
-===================================================== */
-
-function openFixEditor(
-    side,
-    source,
-    canvas,
-    editor,
-    status
-){
-
-    status.textContent =
-        "✂️ Adjust the four corners if needed.";
-
-
-    createManualEditor(
-        side,
-        source,
-        canvas,
-        editor
-    );
-
-}
-
-
-/* =====================================================
-   PROCESS IMAGE
+   PROCESS SIDE
 ===================================================== */
 
 async function processSide(
@@ -2333,9 +2147,7 @@ async function processSide(
             await autoDetect(file);
 
 
-        if(
-            side==="front"
-        ){
+        if(side==="front"){
 
             frontSource =
                 detection.source;
@@ -2363,9 +2175,7 @@ async function processSide(
                 );
 
 
-            if(
-                side==="front"
-            ){
+            if(side==="front"){
 
                 frontCanvas =
                     result;
@@ -2397,14 +2207,11 @@ async function processSide(
 
         /*
            Automatic detection wasn't
-           sufficiently confident.
-
-           Only now do we involve
-           the user.
+           confident enough.
         */
 
         status.textContent =
-            "👆 Just mark the four corners of your document.";
+            "👆 Almost there — mark the four document corners.";
 
 
         createManualEditor(
@@ -2428,9 +2235,7 @@ async function processSide(
             imageToCanvas(img);
 
 
-        if(
-            side==="front"
-        ){
+        if(side==="front"){
 
             frontSource =
                 source;
@@ -2444,7 +2249,7 @@ async function processSide(
 
 
         status.textContent =
-            "👆 Just mark the four corners of your document.";
+            "👆 Mark the four document corners.";
 
 
         createManualEditor(
@@ -2471,27 +2276,17 @@ frontInput.addEventListener(
             frontInput.files[0];
 
 
-        if(!file){
-            return;
-        }
+        if(!file) return;
 
 
         await processSide(
-
             "front",
-
             file,
-
             frontPreview,
-
             frontStatus,
-
             frontEditor,
-
             frontCropCanvas,
-
             frontTools
-
         );
 
     }
@@ -2510,27 +2305,17 @@ backInput.addEventListener(
             backInput.files[0];
 
 
-        if(!file){
-            return;
-        }
+        if(!file) return;
 
 
         await processSide(
-
             "back",
-
             file,
-
             backPreview,
-
             backStatus,
-
             backEditor,
-
             backCropCanvas,
-
             backTools
-
         );
 
     }
@@ -2538,7 +2323,7 @@ backInput.addEventListener(
 
 
 /* =====================================================
-   FRONT MANUAL APPLY
+   FRONT APPLY
 ===================================================== */
 
 frontApply.addEventListener(
@@ -2546,14 +2331,10 @@ frontApply.addEventListener(
     async function(){
 
         const state =
-            manualStates.get(
-                "front"
-            );
+            manualStates.get("front");
 
 
-        if(!state){
-            return;
-        }
+        if(!state) return;
 
 
         frontStatus.textContent =
@@ -2591,7 +2372,7 @@ frontApply.addEventListener(
 
 
 /* =====================================================
-   BACK MANUAL APPLY
+   BACK APPLY
 ===================================================== */
 
 backApply.addEventListener(
@@ -2599,14 +2380,10 @@ backApply.addEventListener(
     async function(){
 
         const state =
-            manualStates.get(
-                "back"
-            );
+            manualStates.get("back");
 
 
-        if(!state){
-            return;
-        }
+        if(!state) return;
 
 
         backStatus.textContent =
@@ -2644,24 +2421,25 @@ backApply.addEventListener(
 
 
 /* =====================================================
-   FRONT FIX
+   FIX FRONT
 ===================================================== */
 
 frontFix.addEventListener(
     "click",
     function(){
 
-        if(!frontSource){
-            return;
-        }
+        if(!frontSource) return;
 
 
-        openFixEditor(
+        frontStatus.textContent =
+            "✂️ Adjust the four corners.";
+
+
+        createManualEditor(
             "front",
             frontSource,
             frontCropCanvas,
-            frontEditor,
-            frontStatus
+            frontEditor
         );
 
     }
@@ -2669,24 +2447,25 @@ frontFix.addEventListener(
 
 
 /* =====================================================
-   BACK FIX
+   FIX BACK
 ===================================================== */
 
 backFix.addEventListener(
     "click",
     function(){
 
-        if(!backSource){
-            return;
-        }
+        if(!backSource) return;
 
 
-        openFixEditor(
+        backStatus.textContent =
+            "✂️ Adjust the four corners.";
+
+
+        createManualEditor(
             "back",
             backSource,
             backCropCanvas,
-            backEditor,
-            backStatus
+            backEditor
         );
 
     }
@@ -2694,16 +2473,14 @@ backFix.addEventListener(
 
 
 /* =====================================================
-   FRONT ROTATE
+   ROTATE FRONT
 ===================================================== */
 
 frontRotate.addEventListener(
     "click",
     function(){
 
-        if(!frontCanvas){
-            return;
-        }
+        if(!frontCanvas) return;
 
 
         frontCanvas =
@@ -2723,16 +2500,14 @@ frontRotate.addEventListener(
 
 
 /* =====================================================
-   BACK ROTATE
+   ROTATE BACK
 ===================================================== */
 
 backRotate.addEventListener(
     "click",
     function(){
 
-        if(!backCanvas){
-            return;
-        }
+        if(!backCanvas) return;
 
 
         backCanvas =
@@ -2761,26 +2536,17 @@ function addToPdf(
     y
 ){
 
-    const pageWidth =
-        210;
-
-
-    const margin =
-        15;
-
+    const pageWidth = 210;
+    const margin = 15;
 
     const maxWidth =
-        pageWidth -
-        margin*2;
+        pageWidth-margin*2;
 
-
-    const maxHeight =
-        112;
+    const maxHeight = 112;
 
 
     let width =
         canvas.width;
-
 
     let height =
         canvas.height;
@@ -2794,7 +2560,6 @@ function addToPdf(
 
 
     width *= scale;
-
     height *= scale;
 
 
@@ -2803,20 +2568,15 @@ function addToPdf(
 
 
     pdf.addImage(
-
         canvas.toDataURL(
             "image/jpeg",
             0.95
         ),
-
         "JPEG",
-
         x,
         y,
-
         width,
         height
-
     );
 
 
@@ -2852,20 +2612,14 @@ makePdf.addEventListener(
             const pdf =
                 new jsPDF({
 
-                    orientation:
-                        "portrait",
-
-                    unit:
-                        "mm",
-
-                    format:
-                        "a4"
+                    orientation:"portrait",
+                    unit:"mm",
+                    format:"a4"
 
                 });
 
 
-            let y =
-                18;
+            let y = 18;
 
 
             if(frontCanvas){
