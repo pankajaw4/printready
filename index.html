@@ -12,14 +12,12 @@
 
 <title>PrintReady</title>
 
+
 <!-- OpenCV -->
 <script src="https://docs.opencv.org/4.x/opencv.js"></script>
 
 <!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- Tesseract OCR -->
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 
 <style>
@@ -30,6 +28,9 @@
 
 body{
     margin:0;
+    background:#f5f7fb;
+    color:#111827;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -37,14 +38,11 @@ body{
         Roboto,
         Arial,
         sans-serif;
-
-    background:#f5f7fb;
-    color:#111827;
 }
 
 .container{
     max-width:620px;
-    margin:auto;
+    margin:0 auto;
     padding:24px 16px 50px;
 }
 
@@ -65,10 +63,11 @@ header{
 }
 
 .card{
-    background:#ffffff;
+    background:#fff;
     border-radius:22px;
     padding:22px;
     margin-bottom:18px;
+
     box-shadow:
         0 8px 30px rgba(15,23,42,.06);
 }
@@ -103,6 +102,8 @@ header{
     font-weight:500;
 
     cursor:pointer;
+
+    -webkit-tap-highlight-color:transparent;
 }
 
 .upload:active{
@@ -115,7 +116,7 @@ header{
 
 .preview{
     width:100%;
-    max-height:500px;
+    max-height:520px;
 
     object-fit:contain;
 
@@ -130,9 +131,11 @@ header{
 
 .status{
     margin-top:10px;
-    font-size:13px;
-    line-height:1.45;
+
     color:#64748b;
+
+    font-size:13px;
+    line-height:1.5;
 }
 
 .actions{
@@ -145,16 +148,20 @@ header{
 button{
     border:0;
     border-radius:14px;
+
     padding:13px 17px;
 
     font-size:15px;
     font-weight:700;
 
     cursor:pointer;
+
+    -webkit-tap-highlight-color:transparent;
 }
 
 .primary{
     width:100%;
+
     padding:17px;
 
     background:#111827;
@@ -169,12 +176,12 @@ button{
 }
 
 .info{
-    background:#eff6ff;
-    color:#1e40af;
+    padding:16px;
 
     border-radius:16px;
 
-    padding:16px;
+    background:#eff6ff;
+    color:#1e40af;
 
     font-size:13px;
     line-height:1.55;
@@ -185,9 +192,9 @@ button{
 }
 
 
-/* ============================
+/* ==========================================
    LOADING
-============================ */
+========================================== */
 
 #loading{
     position:fixed;
@@ -195,4 +202,545 @@ button{
 
     z-index:99999;
 
-    background:rgba(255,255,255,.92
+    background:rgba(255,255,255,.92);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.loaderBox{
+    width:min(290px,90vw);
+
+    padding:26px;
+
+    border-radius:20px;
+
+    background:#fff;
+
+    text-align:center;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.16);
+}
+
+.spinner{
+    width:38px;
+    height:38px;
+
+    margin:0 auto 15px;
+
+    border-radius:50%;
+
+    border:4px solid #e5e7eb;
+    border-top-color:#111827;
+
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+/* ==========================================
+   MANUAL CROP
+========================================== */
+
+.manualEditor{
+    position:relative;
+
+    margin-top:15px;
+
+    overflow:hidden;
+
+    border-radius:16px;
+
+    background:#111827;
+}
+
+.manualCanvas{
+    width:100%;
+    display:block;
+}
+
+.manualHelp{
+    padding:12px;
+
+    background:#1f2937;
+
+    color:#fff;
+
+    font-size:13px;
+    line-height:1.4;
+}
+
+.corner{
+    position:absolute;
+
+    width:25px;
+    height:25px;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:#2563eb;
+
+    border:3px solid white;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.3);
+
+    touch-action:none;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==========================================
+     LOADING
+========================================== -->
+
+<div
+    id="loading"
+    class="hidden"
+>
+
+    <div class="loaderBox">
+
+        <div class="spinner"></div>
+
+        <div id="loadingText">
+            Processing…
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="container">
+
+
+<!-- ==========================================
+     HEADER
+========================================== -->
+
+<header>
+
+    <div class="logo">
+        PrintReady
+    </div>
+
+    <div class="tagline">
+        Turn document photos into clean, print-ready PDFs.
+    </div>
+
+</header>
+
+
+
+<!-- ==========================================
+     FRONT SIDE
+========================================== -->
+
+<div class="card">
+
+    <h2>
+        Front side
+    </h2>
+
+    <p>
+        Select an existing photo. PrintReady will automatically
+        detect, crop and straighten the document.
+    </p>
+
+
+    <label class="upload">
+
+        <input
+            id="frontInput"
+            type="file"
+            accept="image/*"
+        >
+
+        📄 Choose front-side photo
+
+    </label>
+
+
+    <img
+        id="frontPreview"
+        class="preview hidden"
+        alt="Front preview"
+    >
+
+
+    <div
+        id="frontStatus"
+        class="status"
+    ></div>
+
+
+    <div
+        id="frontActions"
+        class="actions hidden"
+    >
+
+        <button
+            class="secondary"
+            onclick="rotateDocument('front')"
+        >
+            Rotate 90°
+        </button>
+
+
+        <button
+            class="secondary"
+            onclick="openManualEditor('front')"
+        >
+            Adjust corners
+        </button>
+
+    </div>
+
+
+    <!-- MANUAL EDITOR -->
+
+    <div
+        id="frontEditor"
+        class="hidden"
+    >
+
+        <div class="manualEditor">
+
+            <canvas
+                id="frontCanvas"
+                class="manualCanvas"
+            ></canvas>
+
+
+            <div
+                id="frontCorner1"
+                class="corner"
+            ></div>
+
+            <div
+                id="frontCorner2"
+                class="corner"
+            ></div>
+
+            <div
+                id="frontCorner3"
+                class="corner"
+            ></div>
+
+            <div
+                id="frontCorner4"
+                class="corner"
+            ></div>
+
+
+            <div class="manualHelp">
+
+                Drag the blue points onto the four corners
+                of the document.
+
+            </div>
+
+        </div>
+
+
+        <div class="actions">
+
+            <button
+                class="primary"
+                onclick="applyManualCrop('front')"
+            >
+                Apply crop
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================
+     BACK SIDE
+========================================== -->
+
+<div class="card">
+
+    <h2>
+        Back side
+    </h2>
+
+    <p>
+        Optional. Add the back-side photo if you need
+        both sides on one A4 page.
+    </p>
+
+
+    <label class="upload">
+
+        <input
+            id="backInput"
+            type="file"
+            accept="image/*"
+        >
+
+        📄 Choose back-side photo
+
+    </label>
+
+
+    <img
+        id="backPreview"
+        class="preview hidden"
+        alt="Back preview"
+    >
+
+
+    <div
+        id="backStatus"
+        class="status"
+    ></div>
+
+
+    <div
+        id="backActions"
+        class="actions hidden"
+    >
+
+        <button
+            class="secondary"
+            onclick="rotateDocument('back')"
+        >
+            Rotate 90°
+        </button>
+
+
+        <button
+            class="secondary"
+            onclick="openManualEditor('back')"
+        >
+            Adjust corners
+        </button>
+
+    </div>
+
+
+    <!-- MANUAL EDITOR -->
+
+    <div
+        id="backEditor"
+        class="hidden"
+    >
+
+        <div class="manualEditor">
+
+            <canvas
+                id="backCanvas"
+                class="manualCanvas"
+            ></canvas>
+
+
+            <div
+                id="backCorner1"
+                class="corner"
+            ></div>
+
+            <div
+                id="backCorner2"
+                class="corner"
+            ></div>
+
+            <div
+                id="backCorner3"
+                class="corner"
+            ></div>
+
+            <div
+                id="backCorner4"
+                class="corner"
+            ></div>
+
+
+            <div class="manualHelp">
+
+                Drag the blue points onto the four corners
+                of the document.
+
+            </div>
+
+        </div>
+
+
+        <div class="actions">
+
+            <button
+                class="primary"
+                onclick="applyManualCrop('back')"
+            >
+                Apply crop
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================
+     PDF
+========================================== -->
+
+<div class="card">
+
+    <h2>
+        A4 layout
+    </h2>
+
+    <p>
+        Your document(s) will be placed neatly on an A4 page.
+    </p>
+
+
+    <button
+        id="createPdf"
+        class="primary"
+    >
+        Create A4 PDF
+    </button>
+
+</div>
+
+
+
+<!-- ==========================================
+     PRIVACY
+========================================== -->
+
+<div class="info">
+
+    🔒 Your photos are processed directly in your browser.
+    They are not uploaded to a PrintReady server.
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let frontOriginal = null;
+let backOriginal = null;
+
+let frontDocument = null;
+let backDocument = null;
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function showLoading(message){
+
+    document
+        .getElementById("loadingText")
+        .textContent = message;
+
+    document
+        .getElementById("loading")
+        .classList
+        .remove("hidden");
+
+}
+
+
+function hideLoading(){
+
+    document
+        .getElementById("loading")
+        .classList
+        .add("hidden");
+
+}
+
+
+/* =========================================================
+   WAIT FOR OPENCV
+========================================================= */
+
+function waitForOpenCV(){
+
+    return new Promise(
+        function(resolve){
+
+            /*
+                OpenCV can take a few seconds to
+                initialise on a phone.
+
+                We wait for cv.Mat instead of
+                blocking the upload button.
+            */
+
+            let attempts = 0;
+
+
+            const timer =
+                setInterval(
+                    function(){
+
+                        attempts++;
+
+
+                        if(
+                            typeof cv !== "undefined" &&
+                            cv.Mat &&
+                            cv.imread &&
+                            cv.findContours
+                        ){
+
+                            clearInterval(timer);
+
+                            resolve(true);
+
+                            return;
+                        }
+
+
+                        /*
+                            30 seconds maximum.
+                        */
+
+                        if(
+                            attempts >= 300
+                        ){
+
+                            clearInterval(timer);
+
+                            resolve(false);
