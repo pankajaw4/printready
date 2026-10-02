@@ -4,22 +4,37 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+>
 
 <title>PrintReady – Document to A4 PDF</title>
 
+
+<!-- PDF ENGINE -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+
+<!-- OPENCV -->
 <script>
+
 let cvReadyResolve;
 
-const cvReady = new Promise(resolve => {
+const cvReady = new Promise(function(resolve){
+
     cvReadyResolve = resolve;
+
 });
+
 
 function onOpenCvReady(){
 
-    if(typeof cv === "undefined") return;
+    if(typeof cv === "undefined"){
+        return;
+    }
+
 
     if(cv.Mat){
 
@@ -28,206 +43,480 @@ function onOpenCvReady(){
     }else{
 
         cv.onRuntimeInitialized = function(){
+
             cvReadyResolve();
+
         };
 
     }
 
 }
+
 </script>
+
 
 <script
     async
     src="https://docs.opencv.org/4.x/opencv.js"
-    onload="onOpenCvReady()">
+    onload="onOpenCvReady()"
+></script>
+
+
+<!-- TESSERACT -->
+<script
+    src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
 </script>
 
 
 <style>
 
+/* =====================================================
+   BASE
+===================================================== */
+
 *{
     box-sizing:border-box;
 }
 
+
 body{
+
     margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
     background:#f5f7fb;
+
     color:#172033;
+
 }
+
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 header{
+
     background:#111827;
+
     color:white;
+
     padding:28px 20px;
+
     text-align:center;
+
 }
+
 
 header h1{
+
     margin:0;
+
     font-size:30px;
+
 }
+
 
 header p{
+
     margin:8px 0 0;
+
     color:#b9c1d0;
+
 }
+
+
+/* =====================================================
+   MAIN
+===================================================== */
 
 main{
+
     max-width:650px;
+
     margin:auto;
+
     padding:20px;
+
 }
+
 
 .card{
+
     background:white;
+
     border-radius:18px;
+
     padding:20px;
+
     margin-bottom:16px;
-    box-shadow:0 5px 20px rgba(0,0,0,.06);
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.06);
+
 }
+
 
 h2{
+
     font-size:19px;
+
     margin-top:0;
+
 }
+
+
+/* =====================================================
+   UPLOAD
+===================================================== */
 
 .upload{
-    border:2px dashed #c8cfdb;
+
+    border:
+        2px dashed #c8cfdb;
+
     border-radius:14px;
+
     padding:20px;
+
     margin:12px 0;
+
 }
+
 
 .upload-title{
+
     text-align:center;
+
     font-weight:600;
+
     font-size:18px;
+
 }
+
 
 input{
+
     width:100%;
+
     margin-top:12px;
+
 }
+
 
 .preview{
+
     display:none;
+
     width:100%;
+
     max-height:300px;
+
     object-fit:contain;
+
     margin-top:14px;
+
     border-radius:10px;
+
     background:#eee;
+
 }
+
+
+/* =====================================================
+   STATUS
+===================================================== */
 
 .status{
+
     display:none;
+
     margin-top:12px;
-    padding:12px;
+
+    padding:13px;
+
     border-radius:10px;
+
     background:#eef4ff;
+
     color:#31558c;
+
     font-size:14px;
+
     line-height:1.45;
+
     text-align:center;
+
 }
+
 
 .note{
+
     font-size:13px;
+
     color:#687386;
+
     line-height:1.5;
+
 }
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
 
 button{
+
     width:100%;
+
     border:0;
+
     border-radius:12px;
+
     padding:15px;
+
     font-size:17px;
+
     font-weight:600;
+
     cursor:pointer;
+
 }
 
-.primary{
-    background:#2563eb;
-    color:white;
-}
-
-.secondary{
-    background:#e9eef7;
-    color:#172033;
-    margin-top:10px;
-}
-
-.green{
-    background:#16a34a;
-    color:white;
-}
-
-.fix{
-    background:#fff4d6;
-    color:#8a5a00;
-    margin-top:10px;
-}
 
 button:disabled{
+
     opacity:.45;
+
 }
+
+
+.primary{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+
+.secondary{
+
+    background:#e9eef7;
+
+    color:#172033;
+
+    margin-top:10px;
+
+}
+
+
+.green{
+
+    background:#16a34a;
+
+    color:white;
+
+}
+
+
+.fix{
+
+    background:#fff4d6;
+
+    color:#8a5a00;
+
+    margin-top:10px;
+
+}
+
+
+/* =====================================================
+   SUCCESS
+===================================================== */
 
 .success{
+
     display:none;
+
     background:#e9f9ef;
+
     color:#126b36;
+
     padding:13px;
+
     border-radius:10px;
+
     margin-top:12px;
+
 }
+
+
+/* =====================================================
+   MANUAL EDITOR
+===================================================== */
 
 .editor{
+
     display:none;
+
     margin-top:14px;
+
 }
+
 
 .editor-title{
+
     font-size:14px;
+
     font-weight:600;
+
     margin-bottom:8px;
+
 }
+
 
 .editor-help{
+
     font-size:13px;
+
     color:#687386;
+
     margin-bottom:10px;
+
     line-height:1.4;
+
 }
+
 
 .crop-wrap{
+
     width:100%;
+
     overflow:hidden;
+
     border-radius:12px;
+
     background:#111;
+
     touch-action:none;
+
 }
+
 
 .crop-canvas{
+
     display:block;
+
     width:100%;
+
     height:auto;
+
     touch-action:none;
+
 }
+
 
 .editor-buttons{
+
     margin-top:10px;
+
 }
+
 
 .small-button{
+
     padding:12px;
+
     font-size:15px;
+
 }
 
+
 .tools{
+
     display:none;
+
     margin-top:10px;
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.loading{
+
+    position:fixed;
+
+    inset:0;
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:rgba(17,24,39,.45);
+
+    z-index:9999;
+
+}
+
+
+.loading-box{
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:22px;
+
+    width:calc(100% - 50px);
+
+    max-width:340px;
+
+    text-align:center;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.2);
+
+}
+
+
+.spinner{
+
+    width:34px;
+
+    height:34px;
+
+    border:
+        4px solid #dbe4f5;
+
+    border-top-color:#2563eb;
+
+    border-radius:50%;
+
+    margin:0 auto 14px;
+
+    animation:
+        spin .8s linear infinite;
+
+}
+
+
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
 }
 
 </style>
@@ -252,6 +541,10 @@ Turn document photos into clean, print-ready PDFs.
 <main>
 
 
+<!-- =================================================
+     DOCUMENT
+================================================== -->
+
 <div class="card">
 
 <h2>📄 Your document</h2>
@@ -265,16 +558,19 @@ Turn document photos into clean, print-ready PDFs.
 Front side
 </div>
 
+
 <input
     id="front"
     type="file"
     accept="image/*"
 >
 
+
 <img
     id="frontPreview"
     class="preview"
 >
+
 
 <div
     id="frontStatus"
@@ -291,8 +587,8 @@ Front side
     </div>
 
     <div class="editor-help">
-        Drag the four blue corners onto the four corners
-        of your document.
+        Drag the four blue corners onto the
+        four corners of your document.
     </div>
 
     <div class="crop-wrap">
@@ -331,6 +627,7 @@ Front side
 
     </button>
 
+
     <button
         id="frontRotate"
         class="secondary small-button">
@@ -352,16 +649,19 @@ Front side
 Back side
 </div>
 
+
 <input
     id="back"
     type="file"
     accept="image/*"
 >
 
+
 <img
     id="backPreview"
     class="preview"
 >
+
 
 <div
     id="backStatus"
@@ -378,8 +678,8 @@ Back side
     </div>
 
     <div class="editor-help">
-        Drag the four blue corners onto the four corners
-        of your document.
+        Drag the four blue corners onto the
+        four corners of your document.
     </div>
 
     <div class="crop-wrap">
@@ -418,6 +718,7 @@ Back side
 
     </button>
 
+
     <button
         id="backRotate"
         class="secondary small-button">
@@ -441,16 +742,21 @@ They are not uploaded to a PrintReady server.
 </div>
 
 
-<!-- PDF -->
+
+<!-- =================================================
+     PDF
+================================================== -->
 
 <div class="card">
 
 <h2>🖨️ A4 layout</h2>
 
+
 <p class="note">
 
-PrintReady automatically detects, crops and straightens
-your document. Manual adjustment is available only when needed.
+PrintReady automatically detects, straightens and
+orients your document. Manual adjustment is available
+only when necessary.
 
 </p>
 
@@ -486,6 +792,11 @@ Create Another
 </div>
 
 
+
+<!-- =================================================
+     INFO
+================================================== -->
+
 <div class="card">
 
 <h2>PrintReady</h2>
@@ -504,6 +815,30 @@ other documents that need to be printed neatly.
 </main>
 
 
+<!-- =================================================
+     LOADING
+================================================== -->
+
+<div
+    id="loading"
+    class="loading">
+
+    <div class="loading-box">
+
+        <div class="spinner"></div>
+
+        <div
+            id="loadingText">
+
+            Processing document…
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
 
 
@@ -511,17 +846,33 @@ other documents that need to be printed neatly.
    ELEMENTS
 ===================================================== */
 
-const frontInput = document.getElementById("front");
-const backInput = document.getElementById("back");
+const frontInput =
+    document.getElementById("front");
 
-const frontPreview = document.getElementById("frontPreview");
-const backPreview = document.getElementById("backPreview");
+const backInput =
+    document.getElementById("back");
 
-const frontStatus = document.getElementById("frontStatus");
-const backStatus = document.getElementById("backStatus");
 
-const frontEditor = document.getElementById("frontEditor");
-const backEditor = document.getElementById("backEditor");
+const frontPreview =
+    document.getElementById("frontPreview");
+
+const backPreview =
+    document.getElementById("backPreview");
+
+
+const frontStatus =
+    document.getElementById("frontStatus");
+
+const backStatus =
+    document.getElementById("backStatus");
+
+
+const frontEditor =
+    document.getElementById("frontEditor");
+
+const backEditor =
+    document.getElementById("backEditor");
+
 
 const frontCropCanvas =
     document.getElementById("frontCropCanvas");
@@ -529,11 +880,13 @@ const frontCropCanvas =
 const backCropCanvas =
     document.getElementById("backCropCanvas");
 
+
 const frontApply =
     document.getElementById("frontApply");
 
 const backApply =
     document.getElementById("backApply");
+
 
 const frontFix =
     document.getElementById("frontFix");
@@ -541,11 +894,13 @@ const frontFix =
 const backFix =
     document.getElementById("backFix");
 
+
 const frontRotate =
     document.getElementById("frontRotate");
 
 const backRotate =
     document.getElementById("backRotate");
+
 
 const frontTools =
     document.getElementById("frontTools");
@@ -553,23 +908,76 @@ const frontTools =
 const backTools =
     document.getElementById("backTools");
 
+
 const makePdf =
     document.getElementById("makePdf");
 
+
 const again =
     document.getElementById("again");
+
 
 const success =
     document.getElementById("success");
 
 
+const loading =
+    document.getElementById("loading");
+
+
+const loadingText =
+    document.getElementById("loadingText");
+
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
 let frontCanvas = null;
+
 let backCanvas = null;
 
+
 let frontSource = null;
+
 let backSource = null;
 
-const manualStates = new Map();
+
+const manualStates =
+    new Map();
+
+
+let orientationWorker =
+    null;
+
+let orientationWorkerPromise =
+    null;
+
+
+
+/* =====================================================
+   LOADING UI
+===================================================== */
+
+function showLoading(message){
+
+    loadingText.textContent =
+        message;
+
+    loading.style.display =
+        "flex";
+
+}
+
+
+function hideLoading(){
+
+    loading.style.display =
+        "none";
+
+}
+
 
 
 /* =====================================================
@@ -578,58 +986,90 @@ const manualStates = new Map();
 
 function loadImage(file){
 
-    return new Promise(function(resolve,reject){
+    return new Promise(
+        function(resolve,reject){
 
-        const img = new Image();
+            const img =
+                new Image();
 
-        img.onload = function(){
-            resolve(img);
-        };
 
-        img.onerror = reject;
+            img.onload =
+                function(){
 
-        img.src = URL.createObjectURL(file);
+                    resolve(img);
 
-    });
+                };
+
+
+            img.onerror =
+                reject;
+
+
+            img.src =
+                URL.createObjectURL(file);
+
+        }
+    );
 
 }
 
 
+
 /* =====================================================
-   IMAGE TO CANVAS
+   IMAGE → CANVAS
 ===================================================== */
 
 function imageToCanvas(img){
 
-    const maximum = 1800;
+    const maximum =
+        1800;
+
 
     let width =
-        img.naturalWidth || img.width;
+        img.naturalWidth ||
+        img.width;
+
 
     let height =
-        img.naturalHeight || img.height;
+        img.naturalHeight ||
+        img.height;
 
 
     const scale =
         Math.min(
             1,
-            maximum / Math.max(width,height)
+            maximum /
+            Math.max(
+                width,
+                height
+            )
         );
 
 
     width =
-        Math.round(width * scale);
+        Math.round(
+            width*scale
+        );
+
 
     height =
-        Math.round(height * scale);
+        Math.round(
+            height*scale
+        );
 
 
     const canvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
 
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width =
+        width;
+
+
+    canvas.height =
+        height;
 
 
     canvas
@@ -648,6 +1088,7 @@ function imageToCanvas(img){
 }
 
 
+
 /* =====================================================
    DISTANCE
 ===================================================== */
@@ -662,77 +1103,103 @@ function distance(a,b){
 }
 
 
+
 /* =====================================================
    ORDER POINTS
 ===================================================== */
 
 function orderPoints(points){
 
-    const result = {
+    let tl = null;
 
-        tl:null,
-        tr:null,
-        br:null,
-        bl:null
+    let tr = null;
 
-    };
+    let br = null;
 
-
-    let minSum = Infinity;
-    let maxSum = -Infinity;
-
-    let minDiff = Infinity;
-    let maxDiff = -Infinity;
+    let bl = null;
 
 
-    points.forEach(function(p){
+    let minSum =
+        Infinity;
 
-        const sum = p.x+p.y;
-        const diff = p.x-p.y;
+    let maxSum =
+        -Infinity;
 
 
-        if(sum < minSum){
+    let minDiff =
+        Infinity;
 
-            minSum = sum;
-            result.tl = p;
+    let maxDiff =
+        -Infinity;
+
+
+    points.forEach(
+        function(p){
+
+            const sum =
+                p.x+p.y;
+
+
+            const diff =
+                p.x-p.y;
+
+
+            if(sum<minSum){
+
+                minSum =
+                    sum;
+
+                tl =
+                    p;
+
+            }
+
+
+            if(sum>maxSum){
+
+                maxSum =
+                    sum;
+
+                br =
+                    p;
+
+            }
+
+
+            if(diff>maxDiff){
+
+                maxDiff =
+                    diff;
+
+                tr =
+                    p;
+
+            }
+
+
+            if(diff<minDiff){
+
+                minDiff =
+                    diff;
+
+                bl =
+                    p;
+
+            }
 
         }
-
-
-        if(sum > maxSum){
-
-            maxSum = sum;
-            result.br = p;
-
-        }
-
-
-        if(diff > maxDiff){
-
-            maxDiff = diff;
-            result.tr = p;
-
-        }
-
-
-        if(diff < minDiff){
-
-            minDiff = diff;
-            result.bl = p;
-
-        }
-
-    });
+    );
 
 
     return [
-        result.tl,
-        result.tr,
-        result.br,
-        result.bl
+        tl,
+        tr,
+        br,
+        bl
     ];
 
 }
+
 
 
 /* =====================================================
@@ -767,9 +1234,12 @@ function polygonArea(points){
     }
 
 
-    return Math.abs(area/2);
+    return Math.abs(
+        area/2
+    );
 
 }
+
 
 
 /* =====================================================
@@ -795,28 +1265,44 @@ function rectangleQuality(points){
 
 
     const top =
-        distance(p[0],p[1]);
+        distance(
+            p[0],
+            p[1]
+        );
+
 
     const right =
-        distance(p[1],p[2]);
+        distance(
+            p[1],
+            p[2]
+        );
+
 
     const bottom =
-        distance(p[3],p[2]);
+        distance(
+            p[3],
+            p[2]
+        );
+
 
     const left =
-        distance(p[0],p[3]);
+        distance(
+            p[0],
+            p[3]
+        );
 
 
     const width =
         (top+bottom)/2;
+
 
     const height =
         (left+right)/2;
 
 
     if(
-        width < 1 ||
-        height < 1
+        width<1 ||
+        height<1
     ){
 
         return null;
@@ -832,13 +1318,12 @@ function rectangleQuality(points){
 
 
     /*
-       Broad enough for ID cards,
-       but rejects portrait photos.
+       Broad ID-card ratio range.
     */
 
     if(
-        ratio < 1.25 ||
-        ratio > 2.15
+        ratio<1.25 ||
+        ratio>2.15
     ){
 
         return null;
@@ -847,18 +1332,30 @@ function rectangleQuality(points){
 
 
     const widthBalance =
-        Math.min(top,bottom) /
-        Math.max(top,bottom);
+        Math.min(
+            top,
+            bottom
+        ) /
+        Math.max(
+            top,
+            bottom
+        );
 
 
     const heightBalance =
-        Math.min(left,right) /
-        Math.max(left,right);
+        Math.min(
+            left,
+            right
+        ) /
+        Math.max(
+            left,
+            right
+        );
 
 
     if(
-        widthBalance < 0.55 ||
-        heightBalance < 0.55
+        widthBalance<0.55 ||
+        heightBalance<0.55
     ){
 
         return null;
@@ -881,6 +1378,7 @@ function rectangleQuality(points){
 }
 
 
+
 /* =====================================================
    ADD CANDIDATE
 ===================================================== */
@@ -892,10 +1390,14 @@ function addCandidate(
 ){
 
     const quality =
-        rectangleQuality(points);
+        rectangleQuality(
+            points
+        );
 
 
-    if(!quality) return;
+    if(!quality){
+        return;
+    }
 
 
     const area =
@@ -909,19 +1411,24 @@ function addCandidate(
 
 
     /*
-       The important protection against
-       detecting the small portrait inside
-       the Aadhaar.
+       Ignore small internal rectangles.
+
+       This is what prevents the
+       Aadhaar portrait from winning.
     */
 
-    if(areaRatio < 0.10){
+    if(
+        areaRatio<0.10
+    ){
 
         return;
 
     }
 
 
-    if(areaRatio > 0.92){
+    if(
+        areaRatio>0.92
+    ){
 
         return;
 
@@ -929,78 +1436,94 @@ function addCandidate(
 
 
     let score =
-        areaRatio * 100;
+        areaRatio*100;
 
 
     /*
-       Strong preference for larger cards.
+       Strong preference for large
+       document candidates.
     */
 
-    if(areaRatio >= 0.20){
+    if(
+        areaRatio>=0.20
+    ){
 
-        score *= 1.25;
+        score*=1.25;
 
     }
 
 
-    if(areaRatio >= 0.30){
+    if(
+        areaRatio>=0.30
+    ){
 
-        score *= 1.20;
+        score*=1.20;
 
     }
 
 
     /*
-       Penalize small internal rectangles.
+       Penalize small internal shapes.
     */
 
-    if(areaRatio < 0.16){
+    if(
+        areaRatio<0.16
+    ){
 
-        score *= 0.25;
+        score*=0.25;
 
     }
 
 
     /*
-       Prefer normal ID-card proportions.
+       Prefer standard card proportions.
     */
 
     const ratioDifference =
         Math.abs(
-            quality.ratio - 1.586
+            quality.ratio-1.586
         );
 
 
     score +=
         Math.max(
             0,
-            15 - ratioDifference*15
+            15 -
+            ratioDifference*15
         );
 
 
     candidates.push({
 
-        points:quality.points,
+        points:
+            quality.points,
 
-        width:quality.width,
+        width:
+            quality.width,
 
-        height:quality.height,
+        height:
+            quality.height,
 
-        area:area,
+        area:
+            area,
 
-        areaRatio:areaRatio,
+        areaRatio:
+            areaRatio,
 
-        ratio:quality.ratio,
+        ratio:
+            quality.ratio,
 
-        score:score
+        score:
+            score
 
     });
 
 }
 
 
+
 /* =====================================================
-   AUTO DETECT
+   AUTOMATIC DOCUMENT DETECTION
 ===================================================== */
 
 async function autoDetect(file){
@@ -1032,7 +1555,8 @@ async function autoDetect(file){
 
 
     const imageArea =
-        src.cols*src.rows;
+        src.cols *
+        src.rows;
 
 
     const candidates = [];
@@ -1045,8 +1569,11 @@ async function autoDetect(file){
     const passes = [
 
         [20,70],
+
         [30,100],
+
         [50,150],
+
         [70,200]
 
     ];
@@ -1060,6 +1587,7 @@ async function autoDetect(file){
 
         const blur =
             new cv.Mat();
+
 
         const edges =
             new cv.Mat();
@@ -1132,11 +1660,14 @@ async function autoDetect(file){
 
 
             if(
-                area < imageArea*0.10 ||
-                area > imageArea*0.92
+                area<
+                imageArea*0.10 ||
+                area>
+                imageArea*0.92
             ){
 
                 contour.delete();
+
                 continue;
 
             }
@@ -1177,10 +1708,14 @@ async function autoDetect(file){
                     points.push({
 
                         x:
-                            approx.data32S[j*2],
+                            approx.data32S[
+                                j*2
+                            ],
 
                         y:
-                            approx.data32S[j*2+1]
+                            approx.data32S[
+                                j*2+1
+                            ]
 
                     });
 
@@ -1197,22 +1732,27 @@ async function autoDetect(file){
 
 
             approx.delete();
+
             contour.delete();
 
         }
 
 
         blur.delete();
+
         edges.delete();
+
         kernel.delete();
+
         contours.delete();
+
         hierarchy.delete();
 
     }
 
 
     /*
-       Bright-card detection.
+       Bright-document detection.
     */
 
     const thresholds =
@@ -1289,11 +1829,14 @@ async function autoDetect(file){
 
 
             if(
-                area < imageArea*0.10 ||
-                area > imageArea*0.92
+                area<
+                imageArea*0.10 ||
+                area>
+                imageArea*0.92
             ){
 
                 contour.delete();
+
                 continue;
 
             }
@@ -1334,10 +1877,14 @@ async function autoDetect(file){
                     points.push({
 
                         x:
-                            approx.data32S[j*2],
+                            approx.data32S[
+                                j*2
+                            ],
 
                         y:
-                            approx.data32S[j*2+1]
+                            approx.data32S[
+                                j*2+1
+                            ]
 
                     });
 
@@ -1354,30 +1901,34 @@ async function autoDetect(file){
 
 
             approx.delete();
+
             contour.delete();
 
         }
 
 
         binary.delete();
+
         kernel.delete();
+
         contours.delete();
+
         hierarchy.delete();
 
     }
 
 
     gray.delete();
+
     src.delete();
 
 
-    /*
-       Sort candidates.
-    */
-
     candidates.sort(
-        (a,b) =>
-            b.score-a.score
+        function(a,b){
+
+            return b.score-a.score;
+
+        }
     );
 
 
@@ -1390,14 +1941,14 @@ async function autoDetect(file){
     /*
        Confidence gate.
 
-       We would rather ask for four corners
-       than produce a wrong document.
+       Never create a bad crop merely
+       because OpenCV found some rectangle.
     */
 
     const confident =
         best &&
-        best.areaRatio >= 0.16 &&
-        best.score >= 20;
+        best.areaRatio>=0.16 &&
+        best.score>=20;
 
 
     return {
@@ -1416,6 +1967,7 @@ async function autoDetect(file){
 }
 
 
+
 /* =====================================================
    ROTATE CLOCKWISE
 ===================================================== */
@@ -1423,11 +1975,14 @@ async function autoDetect(file){
 function rotateClockwise(canvas){
 
     const output =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
 
     output.width =
         canvas.height;
+
 
     output.height =
         canvas.width;
@@ -1458,6 +2013,298 @@ function rotateClockwise(canvas){
     return output;
 
 }
+
+
+
+/* =====================================================
+   ROTATE 180
+===================================================== */
+
+function rotate180(canvas){
+
+    const output =
+        document.createElement(
+            "canvas"
+        );
+
+
+    output.width =
+        canvas.width;
+
+
+    output.height =
+        canvas.height;
+
+
+    const ctx =
+        output.getContext("2d");
+
+
+    ctx.translate(
+        output.width,
+        output.height
+    );
+
+
+    ctx.rotate(
+        Math.PI
+    );
+
+
+    ctx.drawImage(
+        canvas,
+        0,
+        0
+    );
+
+
+    return output;
+
+}
+
+
+
+/* =====================================================
+   ROTATE COUNTER-CLOCKWISE
+===================================================== */
+
+function rotateCounterClockwise(canvas){
+
+    const output =
+        document.createElement(
+            "canvas"
+        );
+
+
+    output.width =
+        canvas.height;
+
+
+    output.height =
+        canvas.width;
+
+
+    const ctx =
+        output.getContext("2d");
+
+
+    ctx.translate(
+        0,
+        output.height
+    );
+
+
+    ctx.rotate(
+        -Math.PI/2
+    );
+
+
+    ctx.drawImage(
+        canvas,
+        0,
+        0
+    );
+
+
+    return output;
+
+}
+
+
+
+/* =====================================================
+   ORIENTATION WORKER
+===================================================== */
+
+async function getOrientationWorker(){
+
+    if(
+        orientationWorker
+    ){
+
+        return orientationWorker;
+
+    }
+
+
+    if(
+        orientationWorkerPromise
+    ){
+
+        return orientationWorkerPromise;
+
+    }
+
+
+    orientationWorkerPromise =
+        (async function(){
+
+            if(
+                typeof Tesseract==="undefined"
+            ){
+
+                throw new Error(
+                    "Orientation engine unavailable."
+                );
+
+            }
+
+
+            /*
+               Tesseract OSD requires
+               the Legacy model.
+            */
+
+            const worker =
+                await Tesseract.createWorker(
+                    "eng",
+                    1,
+                    {
+
+                        legacyCore:true,
+
+                        legacyLang:true
+
+                    }
+                );
+
+
+            orientationWorker =
+                worker;
+
+
+            return worker;
+
+        })();
+
+
+    return orientationWorkerPromise;
+
+}
+
+
+
+/* =====================================================
+   AUTOMATIC ORIENTATION
+===================================================== */
+
+async function orientDocument(canvas){
+
+    try{
+
+        const worker =
+            await getOrientationWorker();
+
+
+        const result =
+            await worker.detect(
+                canvas
+            );
+
+
+        const data =
+            result &&
+            result.data
+            ? result.data
+            : null;
+
+
+        if(!data){
+
+            return canvas;
+
+        }
+
+
+        const degrees =
+            Number(
+                data.orientation_degrees
+            );
+
+
+        const confidence =
+            Number(
+                data.orientation_confidence
+            );
+
+
+        /*
+           OSD returns the clockwise
+           correction needed to make
+           text upright.
+
+           We only trust a real result
+           with reasonable confidence.
+        */
+
+        if(
+            !Number.isFinite(degrees)
+        ){
+
+            return canvas;
+
+        }
+
+
+        if(
+            !Number.isFinite(confidence) ||
+            confidence<5
+        ){
+
+            return canvas;
+
+        }
+
+
+        if(
+            degrees===90
+        ){
+
+            return rotateClockwise(
+                canvas
+            );
+
+        }
+
+
+        if(
+            degrees===180
+        ){
+
+            return rotate180(
+                canvas
+            );
+
+        }
+
+
+        if(
+            degrees===270
+        ){
+
+            return rotateCounterClockwise(
+                canvas
+            );
+
+        }
+
+
+        return canvas;
+
+    }catch(error){
+
+        console.warn(
+            "Orientation detection unavailable:",
+            error
+        );
+
+
+        return canvas;
+
+    }
+
+}
+
 
 
 /* =====================================================
@@ -1522,7 +2369,8 @@ async function perspectiveCrop(
         );
 
 
-    const maxSize = 1600;
+    const maxSize =
+        1600;
 
 
     const longest =
@@ -1532,7 +2380,9 @@ async function perspectiveCrop(
         );
 
 
-    if(longest>maxSize){
+    if(
+        longest>maxSize
+    ){
 
         const scale =
             maxSize/longest;
@@ -1627,11 +2477,14 @@ async function perspectiveCrop(
 
 
     const result =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
 
     result.width =
         outputWidth;
+
 
     result.height =
         outputHeight;
@@ -1644,31 +2497,27 @@ async function perspectiveCrop(
 
 
     src.delete();
+
     srcPoints.delete();
+
     dstPoints.delete();
+
     matrix.delete();
+
     warped.delete();
 
 
     /*
-       Cards should normally be landscape.
+       Now let OCR/OSD determine
+       whether the document is upside down.
     */
 
-    if(
-        result.height >
-        result.width
-    ){
-
-        return rotateClockwise(
-            result
-        );
-
-    }
-
-
-    return result;
+    return await orientDocument(
+        result
+    );
 
 }
+
 
 
 /* =====================================================
@@ -1698,7 +2547,7 @@ function showResult(
 
 
     status.textContent =
-        "✅ Document detected and straightened.";
+        "✅ Document detected, straightened and oriented.";
 
 
     tools.style.display =
@@ -1707,8 +2556,9 @@ function showResult(
 }
 
 
+
 /* =====================================================
-   MANUAL EDITOR
+   MANUAL EDITOR DRAW
 ===================================================== */
 
 function drawManualEditor(state){
@@ -1741,7 +2591,7 @@ function drawManualEditor(state){
 
 
     /*
-       Dark outside overlay.
+       Dark outside area.
     */
 
     ctx.fillStyle =
@@ -1749,6 +2599,7 @@ function drawManualEditor(state){
 
 
     ctx.beginPath();
+
 
     ctx.rect(
         0,
@@ -1784,40 +2635,49 @@ function drawManualEditor(state){
 
     ctx.closePath();
 
-    ctx.fill("evenodd");
+
+    ctx.fill(
+        "evenodd"
+    );
 
 
     /*
-       Outline.
+       Blue outline.
     */
 
     ctx.beginPath();
+
 
     ctx.moveTo(
         p[0].x,
         p[0].y
     );
 
+
     ctx.lineTo(
         p[1].x,
         p[1].y
     );
+
 
     ctx.lineTo(
         p[2].x,
         p[2].y
     );
 
+
     ctx.lineTo(
         p[3].x,
         p[3].y
     );
+
 
     ctx.closePath();
 
 
     ctx.strokeStyle =
         "#2563eb";
+
 
     ctx.lineWidth =
         Math.max(
@@ -1833,60 +2693,69 @@ function drawManualEditor(state){
        Handles.
     */
 
-    p.forEach(function(point,index){
+    p.forEach(
+        function(point,index){
 
-        ctx.beginPath();
-
-
-        ctx.arc(
-            point.x,
-            point.y,
-            Math.max(
-                13,
-                canvas.width/35
-            ),
-            0,
-            Math.PI*2
-        );
+            ctx.beginPath();
 
 
-        ctx.fillStyle =
-            "white";
-
-        ctx.fill();
-
-
-        ctx.strokeStyle =
-            "#2563eb";
-
-        ctx.lineWidth =
-            4;
-
-        ctx.stroke();
+            ctx.arc(
+                point.x,
+                point.y,
+                Math.max(
+                    13,
+                    canvas.width/35
+                ),
+                0,
+                Math.PI*2
+            );
 
 
-        ctx.fillStyle =
-            "#2563eb";
-
-        ctx.font =
-            "bold 14px sans-serif";
-
-        ctx.textAlign =
-            "center";
-
-        ctx.textBaseline =
-            "middle";
+            ctx.fillStyle =
+                "white";
 
 
-        ctx.fillText(
-            String(index+1),
-            point.x,
-            point.y
-        );
+            ctx.fill();
 
-    });
+
+            ctx.strokeStyle =
+                "#2563eb";
+
+
+            ctx.lineWidth =
+                4;
+
+
+            ctx.stroke();
+
+
+            ctx.fillStyle =
+                "#2563eb";
+
+
+            ctx.font =
+                "bold 14px sans-serif";
+
+
+            ctx.textAlign =
+                "center";
+
+
+            ctx.textBaseline =
+                "middle";
+
+
+            ctx.fillText(
+                String(index+1),
+                point.x,
+                point.y
+            );
+
+        }
+    );
 
 }
+
 
 
 /* =====================================================
@@ -1922,18 +2791,25 @@ function createManualEditor(
             },
 
             {
-                x:source.width-marginX,
+                x:
+                    source.width-marginX,
+
                 y:marginY
             },
 
             {
-                x:source.width-marginX,
-                y:source.height-marginY
+                x:
+                    source.width-marginX,
+
+                y:
+                    source.height-marginY
             },
 
             {
                 x:marginX,
-                y:source.height-marginY
+
+                y:
+                    source.height-marginY
             }
 
         ],
@@ -1951,6 +2827,7 @@ function createManualEditor(
 
     canvas.width =
         source.width;
+
 
     canvas.height =
         source.height;
@@ -1974,12 +2851,18 @@ function createManualEditor(
         return {
 
             x:
-                (event.clientX-rect.left) *
+                (
+                    event.clientX -
+                    rect.left
+                ) *
                 canvas.width /
                 rect.width,
 
             y:
-                (event.clientY-rect.top) *
+                (
+                    event.clientY -
+                    rect.top
+                ) *
                 canvas.height /
                 rect.height
 
@@ -1995,8 +2878,12 @@ function createManualEditor(
                 getPoint(event);
 
 
-            let nearest = -1;
-            let nearestDistance = Infinity;
+            let nearest =
+                -1;
+
+
+            let nearestDistance =
+                Infinity;
 
 
             state.points.forEach(
@@ -2010,7 +2897,7 @@ function createManualEditor(
 
 
                     if(
-                        d <
+                        d<
                         nearestDistance
                     ){
 
@@ -2096,7 +2983,8 @@ function createManualEditor(
     canvas.onpointerup =
         function(){
 
-            state.active = -1;
+            state.active =
+                -1;
 
         };
 
@@ -2104,11 +2992,13 @@ function createManualEditor(
     canvas.onpointercancel =
         function(){
 
-            state.active = -1;
+            state.active =
+                -1;
 
         };
 
 }
+
 
 
 /* =====================================================
@@ -2129,16 +3019,16 @@ async function processSide(
         "block";
 
 
-    status.textContent =
-        "🔍 Detecting your document…";
+    tools.style.display =
+        "none";
 
 
     editor.style.display =
         "none";
 
 
-    tools.style.display =
-        "none";
+    status.textContent =
+        "🔍 Finding your document…";
 
 
     try{
@@ -2168,11 +3058,19 @@ async function processSide(
                 "✨ Document found. Straightening…";
 
 
+            showLoading(
+                "Straightening your document…"
+            );
+
+
             const result =
                 await perspectiveCrop(
                     detection.source,
                     detection.points
                 );
+
+
+            hideLoading();
 
 
             if(side==="front"){
@@ -2206,12 +3104,12 @@ async function processSide(
 
 
         /*
-           Automatic detection wasn't
-           confident enough.
+           Auto detection not confident enough.
+           Use manual only as fallback.
         */
 
         status.textContent =
-            "👆 Almost there — mark the four document corners.";
+            "👆 Almost there — mark the four corners.";
 
 
         createManualEditor(
@@ -2227,41 +3125,54 @@ async function processSide(
         console.error(error);
 
 
-        const img =
-            await loadImage(file);
+        hideLoading();
 
 
-        const source =
-            imageToCanvas(img);
+        try{
+
+            const img =
+                await loadImage(file);
 
 
-        if(side==="front"){
+            const source =
+                imageToCanvas(img);
 
-            frontSource =
-                source;
 
-        }else{
+            if(side==="front"){
 
-            backSource =
-                source;
+                frontSource =
+                    source;
+
+            }else{
+
+                backSource =
+                    source;
+
+            }
+
+
+            status.textContent =
+                "👆 Mark the four corners of your document.";
+
+
+            createManualEditor(
+                side,
+                source,
+                cropCanvas,
+                editor
+            );
+
+        }catch{
+
+            status.textContent =
+                "❌ Could not process this image. Please try another photo.";
 
         }
-
-
-        status.textContent =
-            "👆 Mark the four document corners.";
-
-
-        createManualEditor(
-            side,
-            source,
-            cropCanvas,
-            editor
-        );
 
     }
 
 }
+
 
 
 /* =====================================================
@@ -2276,21 +3187,32 @@ frontInput.addEventListener(
             frontInput.files[0];
 
 
-        if(!file) return;
+        if(!file){
+            return;
+        }
 
 
         await processSide(
+
             "front",
+
             file,
+
             frontPreview,
+
             frontStatus,
+
             frontEditor,
+
             frontCropCanvas,
+
             frontTools
+
         );
 
     }
 );
+
 
 
 /* =====================================================
@@ -2305,25 +3227,36 @@ backInput.addEventListener(
             backInput.files[0];
 
 
-        if(!file) return;
+        if(!file){
+            return;
+        }
 
 
         await processSide(
+
             "back",
+
             file,
+
             backPreview,
+
             backStatus,
+
             backEditor,
+
             backCropCanvas,
+
             backTools
+
         );
 
     }
 );
 
 
+
 /* =====================================================
-   FRONT APPLY
+   APPLY FRONT MANUAL CROP
 ===================================================== */
 
 frontApply.addEventListener(
@@ -2331,48 +3264,66 @@ frontApply.addEventListener(
     async function(){
 
         const state =
-            manualStates.get("front");
+            manualStates.get(
+                "front"
+            );
 
 
-        if(!state) return;
+        if(!state){
+            return;
+        }
 
 
         frontStatus.textContent =
             "✂️ Straightening document…";
 
 
-        const result =
-            await perspectiveCrop(
-                state.source,
-                state.points
-            );
-
-
-        frontCanvas =
-            result;
-
-
-        frontEditor.style.display =
-            "none";
-
-
-        showResult(
-            result,
-            frontPreview,
-            frontStatus,
-            frontTools
+        showLoading(
+            "Straightening your document…"
         );
 
 
-        makePdf.disabled =
-            false;
+        try{
+
+            const result =
+                await perspectiveCrop(
+                    state.source,
+                    state.points
+                );
+
+
+            frontCanvas =
+                result;
+
+
+            frontEditor.style.display =
+                "none";
+
+
+            showResult(
+                result,
+                frontPreview,
+                frontStatus,
+                frontTools
+            );
+
+
+            makePdf.disabled =
+                false;
+
+        }finally{
+
+            hideLoading();
+
+        }
 
     }
 );
 
 
+
 /* =====================================================
-   BACK APPLY
+   APPLY BACK MANUAL CROP
 ===================================================== */
 
 backApply.addEventListener(
@@ -2380,55 +3331,75 @@ backApply.addEventListener(
     async function(){
 
         const state =
-            manualStates.get("back");
+            manualStates.get(
+                "back"
+            );
 
 
-        if(!state) return;
+        if(!state){
+            return;
+        }
 
 
         backStatus.textContent =
             "✂️ Straightening document…";
 
 
-        const result =
-            await perspectiveCrop(
-                state.source,
-                state.points
-            );
-
-
-        backCanvas =
-            result;
-
-
-        backEditor.style.display =
-            "none";
-
-
-        showResult(
-            result,
-            backPreview,
-            backStatus,
-            backTools
+        showLoading(
+            "Straightening your document…"
         );
 
 
-        makePdf.disabled =
-            false;
+        try{
+
+            const result =
+                await perspectiveCrop(
+                    state.source,
+                    state.points
+                );
+
+
+            backCanvas =
+                result;
+
+
+            backEditor.style.display =
+                "none";
+
+
+            showResult(
+                result,
+                backPreview,
+                backStatus,
+                backTools
+            );
+
+
+            makePdf.disabled =
+                false;
+
+        }finally{
+
+            hideLoading();
+
+        }
 
     }
 );
 
 
+
 /* =====================================================
-   FIX FRONT
+   ADJUST FRONT
 ===================================================== */
 
 frontFix.addEventListener(
     "click",
     function(){
 
-        if(!frontSource) return;
+        if(!frontSource){
+            return;
+        }
 
 
         frontStatus.textContent =
@@ -2436,25 +3407,33 @@ frontFix.addEventListener(
 
 
         createManualEditor(
+
             "front",
+
             frontSource,
+
             frontCropCanvas,
+
             frontEditor
+
         );
 
     }
 );
 
 
+
 /* =====================================================
-   FIX BACK
+   ADJUST BACK
 ===================================================== */
 
 backFix.addEventListener(
     "click",
     function(){
 
-        if(!backSource) return;
+        if(!backSource){
+            return;
+        }
 
 
         backStatus.textContent =
@@ -2462,14 +3441,20 @@ backFix.addEventListener(
 
 
         createManualEditor(
+
             "back",
+
             backSource,
+
             backCropCanvas,
+
             backEditor
+
         );
 
     }
 );
+
 
 
 /* =====================================================
@@ -2480,7 +3465,9 @@ frontRotate.addEventListener(
     "click",
     function(){
 
-        if(!frontCanvas) return;
+        if(!frontCanvas){
+            return;
+        }
 
 
         frontCanvas =
@@ -2499,6 +3486,7 @@ frontRotate.addEventListener(
 );
 
 
+
 /* =====================================================
    ROTATE BACK
 ===================================================== */
@@ -2507,7 +3495,9 @@ backRotate.addEventListener(
     "click",
     function(){
 
-        if(!backCanvas) return;
+        if(!backCanvas){
+            return;
+        }
 
 
         backCanvas =
@@ -2526,6 +3516,7 @@ backRotate.addEventListener(
 );
 
 
+
 /* =====================================================
    ADD IMAGE TO PDF
 ===================================================== */
@@ -2536,17 +3527,26 @@ function addToPdf(
     y
 ){
 
-    const pageWidth = 210;
-    const margin = 15;
+    const pageWidth =
+        210;
+
+
+    const margin =
+        15;
+
 
     const maxWidth =
-        pageWidth-margin*2;
+        pageWidth -
+        margin*2;
 
-    const maxHeight = 112;
+
+    const maxHeight =
+        112;
 
 
     let width =
         canvas.width;
+
 
     let height =
         canvas.height;
@@ -2560,6 +3560,7 @@ function addToPdf(
 
 
     width *= scale;
+
     height *= scale;
 
 
@@ -2568,21 +3569,29 @@ function addToPdf(
 
 
     pdf.addImage(
+
         canvas.toDataURL(
             "image/jpeg",
             0.95
         ),
+
         "JPEG",
+
         x,
+
         y,
+
         width,
+
         height
+
     );
 
 
     return y+height;
 
 }
+
 
 
 /* =====================================================
@@ -2612,14 +3621,20 @@ makePdf.addEventListener(
             const pdf =
                 new jsPDF({
 
-                    orientation:"portrait",
-                    unit:"mm",
-                    format:"a4"
+                    orientation:
+                        "portrait",
+
+                    unit:
+                        "mm",
+
+                    format:
+                        "a4"
 
                 });
 
 
-            let y = 18;
+            let y =
+                18;
 
 
             if(frontCanvas){
@@ -2688,6 +3703,7 @@ makePdf.addEventListener(
 );
 
 
+
 /* =====================================================
    CREATE ANOTHER
 ===================================================== */
@@ -2697,6 +3713,31 @@ again.addEventListener(
     function(){
 
         location.reload();
+
+    }
+);
+
+
+
+/* =====================================================
+   CLEANUP OCR WORKER
+===================================================== */
+
+window.addEventListener(
+    "pagehide",
+    async function(){
+
+        if(
+            orientationWorker
+        ){
+
+            try{
+
+                await orientationWorker.terminate();
+
+            }catch{}
+
+        }
 
     }
 );
