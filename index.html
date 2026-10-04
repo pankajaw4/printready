@@ -1,26 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>PrintReady</title>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
     margin:0;
     padding:0;
-    background:#f5f7fb;
-    color:#111827;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    min-height:100%;
 }
 
 body{
-    min-height:100vh;
+    background:#f5f7fb;
+    color:#111827;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
 }
 
 .container{
@@ -128,7 +142,7 @@ button{
     width:100%;
     padding:17px;
     background:#111827;
-    color:white;
+    color:#fff;
     font-size:16px;
 }
 
@@ -147,10 +161,8 @@ button{
 }
 
 .hidden{
-    display:none !important;
+    display:none!important;
 }
-
-/* Loading overlay */
 
 #loading{
     position:fixed;
@@ -163,8 +175,8 @@ button{
 }
 
 .loaderBox{
-    width:min(290px,90vw);
-    padding:26px;
+    width:min(300px,90vw);
+    padding:27px;
     border-radius:20px;
     background:#fff;
     text-align:center;
@@ -186,8 +198,6 @@ button{
         transform:rotate(360deg);
     }
 }
-
-/* Manual editor */
 
 .manualEditor{
     position:relative;
@@ -212,8 +222,8 @@ button{
 
 .corner{
     position:absolute;
-    width:26px;
-    height:26px;
+    width:27px;
+    height:27px;
     transform:translate(-50%,-50%);
     border-radius:50%;
     background:#2563eb;
@@ -224,30 +234,46 @@ button{
 
 .engineStatus{
     margin-top:10px;
-    font-size:12px;
     color:#94a3b8;
+    font-size:12px;
 }
+
 </style>
+
 </head>
+
 
 <body>
 
-<!-- Loading -->
+
 <div id="loading" class="hidden">
+
     <div class="loaderBox">
+
         <div class="spinner"></div>
-        <div id="loadingText">Processing…</div>
+
+        <div id="loadingText">
+            Processing…
+        </div>
+
     </div>
+
 </div>
 
 
 <div class="container">
 
+
 <header>
-    <div class="logo">PrintReady</div>
+
+    <div class="logo">
+        PrintReady
+    </div>
+
     <div class="tagline">
         Turn document photos into clean, print-ready PDFs.
     </div>
+
 </header>
 
 
@@ -258,8 +284,8 @@ button{
     <h2>Front side</h2>
 
     <p>
-        Select an existing photo. PrintReady will automatically detect,
-        crop and straighten the document.
+        Select an existing photo. PrintReady will detect,
+        crop, straighten and orient the document.
     </p>
 
     <label class="upload">
@@ -274,16 +300,19 @@ button{
 
     </label>
 
+
     <img
         id="frontPreview"
         class="preview hidden"
         alt="Front preview"
     >
 
+
     <div
         id="frontStatus"
         class="status"
     ></div>
+
 
     <div
         id="frontActions"
@@ -296,6 +325,7 @@ button{
         >
             Rotate 90°
         </button>
+
 
         <button
             class="secondary"
@@ -319,6 +349,7 @@ button{
                 class="manualCanvas"
             ></canvas>
 
+
             <div
                 id="frontCorner1"
                 class="corner"
@@ -339,11 +370,14 @@ button{
                 class="corner"
             ></div>
 
+
             <div class="manualHelp">
-                Drag the blue points onto the four corners of the document.
+                Drag the blue points onto the four corners
+                of the document.
             </div>
 
         </div>
+
 
         <div class="actions">
 
@@ -368,9 +402,10 @@ button{
     <h2>Back side</h2>
 
     <p>
-        Optional. Add the back-side photo if you need both sides
-        on one A4 page.
+        Optional. Add the back-side photo if you need
+        both sides on one A4 page.
     </p>
+
 
     <label class="upload">
 
@@ -384,16 +419,19 @@ button{
 
     </label>
 
+
     <img
         id="backPreview"
         class="preview hidden"
         alt="Back preview"
     >
 
+
     <div
         id="backStatus"
         class="status"
     ></div>
+
 
     <div
         id="backActions"
@@ -406,6 +444,7 @@ button{
         >
             Rotate 90°
         </button>
+
 
         <button
             class="secondary"
@@ -429,6 +468,7 @@ button{
                 class="manualCanvas"
             ></canvas>
 
+
             <div
                 id="backCorner1"
                 class="corner"
@@ -449,11 +489,14 @@ button{
                 class="corner"
             ></div>
 
+
             <div class="manualHelp">
-                Drag the blue points onto the four corners of the document.
+                Drag the blue points onto the four corners
+                of the document.
             </div>
 
         </div>
+
 
         <div class="actions">
 
@@ -481,12 +524,14 @@ button{
         Your document(s) will be placed neatly on an A4 page.
     </p>
 
+
     <button
         id="createPdf"
         class="primary"
     >
         Create A4 PDF
     </button>
+
 
     <div
         id="engineStatus"
@@ -505,20 +550,16 @@ button{
 
 </div>
 
+
 </div>
 
 
 <script>
 
+
 /* ============================================================
    PRINTREADY
-   Stable client-side document scanner
    ============================================================ */
-
-
-/* ------------------------------------------------------------
-   APPLICATION STATE
-   ------------------------------------------------------------ */
 
 let frontOriginal = null;
 let backOriginal = null;
@@ -527,12 +568,13 @@ let frontDocument = null;
 let backDocument = null;
 
 let openCVPromise = null;
+let tesseractPromise = null;
 let jsPDFPromise = null;
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    UI
-   ------------------------------------------------------------ */
+   ============================================================ */
 
 function showLoading(message){
 
@@ -567,101 +609,123 @@ function setStatus(side,message){
 function updatePreview(side,canvas){
 
     const preview =
-        document.getElementById(side + "Preview");
+        document.getElementById(
+            side + "Preview"
+        );
+
 
     preview.src =
         canvas.toDataURL(
             "image/jpeg",
-            0.94
+            0.96
         );
 
-    preview.classList.remove("hidden");
+
+    preview.classList.remove(
+        "hidden"
+    );
+
 
     document
-        .getElementById(side + "Actions")
+        .getElementById(
+            side + "Actions"
+        )
         .classList
         .remove("hidden");
 }
 
 
-/* ------------------------------------------------------------
-   DYNAMIC LIBRARY LOADER
-   IMPORTANT:
-   Nothing external is loaded before the UI renders.
-   ------------------------------------------------------------ */
+/* ============================================================
+   SCRIPT LOADER
+   ============================================================ */
 
 function loadScript(src){
 
-    return new Promise(function(resolve,reject){
+    return new Promise(
+        function(resolve,reject){
 
-        const existing =
-            document.querySelector(
-                'script[src="' + src + '"]'
-            );
+            const existing =
+                document.querySelector(
+                    'script[src="' + src + '"]'
+                );
 
-        if(existing){
 
-            if(existing.dataset.loaded === "true"){
-                resolve();
+            if(existing){
+
+                if(
+                    existing.dataset.loaded ===
+                    "true"
+                ){
+
+                    resolve();
+
+                    return;
+                }
+
+
+                existing.addEventListener(
+                    "load",
+                    resolve,
+                    {once:true}
+                );
+
+
+                existing.addEventListener(
+                    "error",
+                    reject,
+                    {once:true}
+                );
+
+
                 return;
             }
 
-            existing.addEventListener(
-                "load",
-                function(){
-                    resolve();
-                },
-                {once:true}
-            );
 
-            existing.addEventListener(
-                "error",
+            const script =
+                document.createElement(
+                    "script"
+                );
+
+
+            script.src = src;
+            script.async = true;
+
+
+            script.onload =
                 function(){
+
+                    script.dataset.loaded =
+                        "true";
+
+                    resolve();
+
+                };
+
+
+            script.onerror =
+                function(){
+
                     reject(
                         new Error(
-                            "Could not load " + src
+                            "External library failed to load."
                         )
                     );
-                },
-                {once:true}
+
+                };
+
+
+            document.head.appendChild(
+                script
             );
 
-            return;
         }
-
-
-        const script =
-            document.createElement("script");
-
-        script.src = src;
-
-        script.async = true;
-
-        script.onload = function(){
-
-            script.dataset.loaded = "true";
-
-            resolve();
-        };
-
-        script.onerror = function(){
-
-            reject(
-                new Error(
-                    "Could not load " + src
-                )
-            );
-        };
-
-        document.head.appendChild(script);
-
-    });
+    );
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    OPENCV
-   ------------------------------------------------------------ */
+   ============================================================ */
 
 async function loadOpenCV(){
 
@@ -677,6 +741,7 @@ async function loadOpenCV(){
 
 
     if(openCVPromise){
+
         return openCVPromise;
     }
 
@@ -684,13 +749,12 @@ async function loadOpenCV(){
     openCVPromise =
         (async function(){
 
-            const status =
-                document.getElementById(
+            document
+                .getElementById(
                     "engineStatus"
-                );
-
-            status.textContent =
-                "Loading document scanner…";
+                )
+                .textContent =
+                    "Loading document scanner…";
 
 
             await loadScript(
@@ -698,47 +762,68 @@ async function loadOpenCV(){
             );
 
 
-            return new Promise(function(resolve,reject){
+            return new Promise(
+                function(resolve,reject){
 
-                let attempts = 0;
-
-                const timer =
-                    setInterval(function(){
-
-                        attempts++;
-
-                        if(
-                            typeof cv !== "undefined" &&
-                            cv.Mat &&
-                            cv.imread &&
-                            cv.findContours
-                        ){
-
-                            clearInterval(timer);
-
-                            status.textContent =
-                                "Document scanner ready.";
-
-                            resolve(true);
-
-                            return;
-                        }
+                    let attempts = 0;
 
 
-                        if(attempts > 200){
+                    const timer =
+                        setInterval(
+                            function(){
 
-                            clearInterval(timer);
+                                attempts++;
 
-                            reject(
-                                new Error(
-                                    "OpenCV initialization timed out."
-                                )
-                            );
-                        }
 
-                    },100);
+                                if(
+                                    typeof cv !==
+                                        "undefined" &&
+                                    cv.Mat &&
+                                    cv.imread &&
+                                    cv.findContours
+                                ){
 
-            });
+                                    clearInterval(
+                                        timer
+                                    );
+
+
+                                    document
+                                        .getElementById(
+                                            "engineStatus"
+                                        )
+                                        .textContent =
+                                            "Document scanner ready.";
+
+
+                                    resolve(true);
+
+                                    return;
+                                }
+
+
+                                if(
+                                    attempts > 200
+                                ){
+
+                                    clearInterval(
+                                        timer
+                                    );
+
+
+                                    reject(
+                                        new Error(
+                                            "OpenCV initialization timeout."
+                                        )
+                                    );
+                                }
+
+                            },
+                            100
+                        );
+
+                }
+            );
 
         })();
 
@@ -747,9 +832,57 @@ async function loadOpenCV(){
 }
 
 
-/* ------------------------------------------------------------
-   jsPDF
-   ------------------------------------------------------------ */
+/* ============================================================
+   TESSERACT
+   ============================================================ */
+
+async function loadTesseract(){
+
+    if(
+        window.Tesseract &&
+        window.Tesseract.createWorker
+    ){
+
+        return window.Tesseract;
+    }
+
+
+    if(tesseractPromise){
+
+        return tesseractPromise;
+    }
+
+
+    tesseractPromise =
+        (async function(){
+
+            await loadScript(
+                "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"
+            );
+
+
+            if(
+                !window.Tesseract
+            ){
+
+                throw new Error(
+                    "OCR engine unavailable."
+                );
+            }
+
+
+            return window.Tesseract;
+
+        })();
+
+
+    return tesseractPromise;
+}
+
+
+/* ============================================================
+   JSPDF
+   ============================================================ */
 
 async function loadJsPDF(){
 
@@ -763,6 +896,7 @@ async function loadJsPDF(){
 
 
     if(jsPDFPromise){
+
         return jsPDFPromise;
     }
 
@@ -774,6 +908,7 @@ async function loadJsPDF(){
                 "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
             );
 
+
             if(
                 !window.jspdf ||
                 !window.jspdf.jsPDF
@@ -784,6 +919,7 @@ async function loadJsPDF(){
                 );
             }
 
+
             return window.jspdf.jsPDF;
 
         })();
@@ -793,63 +929,85 @@ async function loadJsPDF(){
 }
 
 
-/* ------------------------------------------------------------
-   IMAGE HELPERS
-   ------------------------------------------------------------ */
+/* ============================================================
+   IMAGE
+   ============================================================ */
 
 function loadImageFromFile(file){
 
-    return new Promise(function(resolve,reject){
+    return new Promise(
+        function(resolve,reject){
 
-        const reader =
-            new FileReader();
-
-        reader.onload = function(){
-
-            const img =
-                new Image();
-
-            img.onload = function(){
-                resolve(img);
-            };
-
-            img.onerror = function(){
-                reject(
-                    new Error(
-                        "Image could not be loaded."
-                    )
-                );
-            };
-
-            img.src =
-                reader.result;
-        };
+            const reader =
+                new FileReader();
 
 
-        reader.onerror = function(){
+            reader.onload =
+                function(){
 
-            reject(
-                new Error(
-                    "File could not be read."
-                )
+                    const img =
+                        new Image();
+
+
+                    img.onload =
+                        function(){
+
+                            resolve(img);
+
+                        };
+
+
+                    img.onerror =
+                        function(){
+
+                            reject(
+                                new Error(
+                                    "Image could not be loaded."
+                                )
+                            );
+
+                        };
+
+
+                    img.src =
+                        reader.result;
+
+                };
+
+
+            reader.onerror =
+                function(){
+
+                    reject(
+                        new Error(
+                            "Could not read image."
+                        )
+                    );
+
+                };
+
+
+            reader.readAsDataURL(
+                file
             );
-        };
 
-
-        reader.readAsDataURL(file);
-
-    });
+        }
+    );
 }
 
 
 function imageToCanvas(img){
 
     const canvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
+
 
     canvas.width =
         img.naturalWidth ||
         img.width;
+
 
     canvas.height =
         img.naturalHeight ||
@@ -857,7 +1015,10 @@ function imageToCanvas(img){
 
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
+
 
     ctx.drawImage(
         img,
@@ -870,20 +1031,26 @@ function imageToCanvas(img){
 }
 
 
-function rotateClockwise(canvas){
+function rotate90(canvas){
 
     const output =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
+
 
     output.width =
         canvas.height;
+
 
     output.height =
         canvas.width;
 
 
     const ctx =
-        output.getContext("2d");
+        output.getContext(
+            "2d"
+        );
 
 
     ctx.translate(
@@ -908,20 +1075,70 @@ function rotateClockwise(canvas){
 }
 
 
-function rotateCounterClockwise(canvas){
+function rotate180(canvas){
 
     const output =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
+
+
+    output.width =
+        canvas.width;
+
+
+    output.height =
+        canvas.height;
+
+
+    const ctx =
+        output.getContext(
+            "2d"
+        );
+
+
+    ctx.translate(
+        output.width / 2,
+        output.height / 2
+    );
+
+
+    ctx.rotate(
+        Math.PI
+    );
+
+
+    ctx.drawImage(
+        canvas,
+        -canvas.width / 2,
+        -canvas.height / 2
+    );
+
+
+    return output;
+}
+
+
+function rotate270(canvas){
+
+    const output =
+        document.createElement(
+            "canvas"
+        );
+
 
     output.width =
         canvas.height;
+
 
     output.height =
         canvas.width;
 
 
     const ctx =
-        output.getContext("2d");
+        output.getContext(
+            "2d"
+        );
 
 
     ctx.translate(
@@ -946,9 +1163,9 @@ function rotateCounterClockwise(canvas){
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    GEOMETRY
-   ------------------------------------------------------------ */
+   ============================================================ */
 
 function distance(a,b){
 
@@ -961,55 +1178,48 @@ function distance(a,b){
 
 function orderPoints(points){
 
-    const pts =
-        points.slice();
+    const sums =
+        points.map(
+            p => p.x + p.y
+        );
 
 
-    let tl = null;
-    let tr = null;
-    let br = null;
-    let bl = null;
+    const diffs =
+        points.map(
+            p => p.x - p.y
+        );
 
 
-    let minSum = Infinity;
-    let maxSum = -Infinity;
-
-    let minDiff = Infinity;
-    let maxDiff = -Infinity;
-
-
-    for(const p of pts){
-
-        const sum =
-            p.x + p.y;
-
-        const diff =
-            p.x - p.y;
+    const tl =
+        points[
+            sums.indexOf(
+                Math.min(...sums)
+            )
+        ];
 
 
-        if(sum < minSum){
-            minSum = sum;
-            tl = p;
-        }
+    const br =
+        points[
+            sums.indexOf(
+                Math.max(...sums)
+            )
+        ];
 
 
-        if(sum > maxSum){
-            maxSum = sum;
-            br = p;
-        }
+    const tr =
+        points[
+            diffs.indexOf(
+                Math.max(...diffs)
+            )
+        ];
 
 
-        if(diff > maxDiff){
-            maxDiff = diff;
-            tr = p;
-        }
-
-
-        if(diff < minDiff){
-            minDiff = diff;
-            bl = p;
-        }
-    }
+    const bl =
+        points[
+            diffs.indexOf(
+                Math.min(...diffs)
+            )
+        ];
 
 
     return [
@@ -1021,20 +1231,11 @@ function orderPoints(points){
 }
 
 
-/* ------------------------------------------------------------
-   DOCUMENT DETECTION
-   ------------------------------------------------------------ */
+/* ============================================================
+   DOCUMENT DETECTOR
+   ============================================================ */
 
-function detectDocument(sourceCanvas){
-
-    if(
-        typeof cv === "undefined" ||
-        !cv.imread
-    ){
-
-        return null;
-    }
-
+function detectDocument(canvas){
 
     let src = null;
     let gray = null;
@@ -1048,16 +1249,13 @@ function detectDocument(sourceCanvas){
     try{
 
         src =
-            cv.imread(sourceCanvas);
+            cv.imread(
+                canvas
+            );
 
 
-        /*
-         Reduce processing size.
-        The final crop is still taken from
-        the original image.
-        */
-
-        const maxDimension = 1600;
+        const maxDimension =
+            1800;
 
 
         if(
@@ -1084,10 +1282,12 @@ function detectDocument(sourceCanvas){
                 resized,
                 new cv.Size(
                     Math.round(
-                        src.cols * scale
+                        src.cols *
+                        scale
                     ),
                     Math.round(
-                        src.rows * scale
+                        src.rows *
+                        scale
                     )
                 ),
                 0,
@@ -1098,15 +1298,18 @@ function detectDocument(sourceCanvas){
 
             src.delete();
 
-            src = resized;
+            src =
+                resized;
         }
 
 
         gray =
             new cv.Mat();
 
+
         blur =
             new cv.Mat();
+
 
         edges =
             new cv.Mat();
@@ -1130,14 +1333,10 @@ function detectDocument(sourceCanvas){
         cv.Canny(
             blur,
             edges,
-            35,
-            120
+            25,
+            110
         );
 
-
-        /*
-        Close small gaps in document edges.
-        */
 
         kernel =
             cv.Mat.ones(
@@ -1156,11 +1355,33 @@ function detectDocument(sourceCanvas){
 
 
         kernel.delete();
+
+        kernel = null;
+
+
+        kernel =
+            cv.Mat.ones(
+                3,
+                3,
+                cv.CV_8U
+            );
+
+
+        cv.dilate(
+            edges,
+            edges,
+            kernel
+        );
+
+
+        kernel.delete();
+
         kernel = null;
 
 
         contours =
             new cv.MatVector();
+
 
         hierarchy =
             new cv.Mat();
@@ -1175,15 +1396,17 @@ function detectDocument(sourceCanvas){
         );
 
 
-        const candidates = [];
-
         const imageArea =
-            src.cols * src.rows;
+            src.cols *
+            src.rows;
+
+
+        const candidates = [];
 
 
         for(
-            let i = 0;
-            i < contours.size();
+            let i=0;
+            i<contours.size();
             i++
         ){
 
@@ -1200,17 +1423,17 @@ function detectDocument(sourceCanvas){
 
 
             const areaRatio =
-                area / imageArea;
+                area /
+                imageArea;
 
 
             /*
-            Ignore tiny objects and
-            almost-full-image borders.
+            Allow small cards.
             */
 
             if(
-                areaRatio < 0.08 ||
-                areaRatio > 0.92
+                areaRatio < 0.025 ||
+                areaRatio > 0.93
             ){
 
                 contour.delete();
@@ -1233,10 +1456,8 @@ function detectDocument(sourceCanvas){
             cv.approxPolyDP(
                 contour,
                 approx,
-                Math.max(
-                    0.015 * perimeter,
-                    3
-                ),
+                0.02 *
+                perimeter,
                 true
             );
 
@@ -1249,12 +1470,12 @@ function detectDocument(sourceCanvas){
 
 
                 for(
-                    let j = 0;
-                    j < 4;
+                    let j=0;
+                    j<4;
                     j++
                 ){
 
-                    const point =
+                    const p =
                         approx.intPtr(
                             j,
                             0
@@ -1262,9 +1483,12 @@ function detectDocument(sourceCanvas){
 
 
                     points.push({
-                        x: point[0],
-                        y: point[1]
+
+                        x:p[0],
+                        y:p[1]
+
                     });
+
                 }
 
 
@@ -1274,103 +1498,130 @@ function detectDocument(sourceCanvas){
                     );
 
 
+                const width =
+                    (
+                        distance(
+                            ordered[0],
+                            ordered[1]
+                        )
+                        +
+                        distance(
+                            ordered[3],
+                            ordered[2]
+                        )
+                    ) / 2;
+
+
+                const height =
+                    (
+                        distance(
+                            ordered[0],
+                            ordered[3]
+                        )
+                        +
+                        distance(
+                            ordered[1],
+                            ordered[2]
+                        )
+                    ) / 2;
+
+
                 if(
-                    ordered.every(Boolean)
+                    width > 30 &&
+                    height > 30
                 ){
 
-                    const width =
-                        (
-                            distance(
-                                ordered[0],
-                                ordered[1]
-                            )
-                            +
-                            distance(
-                                ordered[3],
-                                ordered[2]
-                            )
-                        ) / 2;
-
-
-                    const height =
-                        (
-                            distance(
-                                ordered[0],
-                                ordered[3]
-                            )
-                            +
-                            distance(
-                                ordered[1],
-                                ordered[2]
-                            )
-                        ) / 2;
+                    const ratio =
+                        Math.max(
+                            width,
+                            height
+                        ) /
+                        Math.min(
+                            width,
+                            height
+                        );
 
 
                     if(
-                        width > 40 &&
-                        height > 40
+                        ratio >= 1.20 &&
+                        ratio <= 2.50
                     ){
 
-                        const ratio =
+                        /*
+                        Strong preference for
+                        Aadhaar/card-like geometry.
+                        */
+
+                        const ratioPenalty =
+                            Math.abs(
+                                ratio -
+                                1.586
+                            );
+
+
+                        let score =
+                            areaRatio *
+                            100;
+
+
+                        score +=
                             Math.max(
-                                width,
-                                height
-                            ) /
-                            Math.min(
-                                width,
-                                height
+                                0,
+                                40 -
+                                ratioPenalty *
+                                25
                             );
 
 
                         /*
-                        ID/document cards are
-                        normally rectangular.
+                        Reward candidates that
+                        aren't tiny.
                         */
 
                         if(
-                            ratio >= 1.25 &&
-                            ratio <= 2.35
+                            areaRatio >
+                            0.08
                         ){
 
-                            /*
-                            Prefer larger candidates,
-                            but reward the common
-                            ID-card aspect ratio.
-                            */
+                            score += 15;
 
-                            const ratioScore =
-                                Math.max(
-                                    0,
-                                    1 -
-                                    Math.abs(
-                                        ratio - 1.586
-                                    ) / 0.8
-                                );
-
-
-                            const score =
-                                areaRatio * 100 +
-                                ratioScore * 35;
-
-
-                            candidates.push({
-                                score:score,
-                                points:ordered,
-                                areaRatio:areaRatio
-                            });
                         }
+
+
+                        if(
+                            areaRatio >
+                            0.15
+                        ){
+
+                            score += 15;
+
+                        }
+
+
+                        candidates.push({
+
+                            score:score,
+
+                            points:ordered
+
+                        });
+
                     }
+
                 }
+
             }
 
 
             approx.delete();
+
             contour.delete();
+
         }
 
 
         if(
-            candidates.length === 0
+            !candidates.length
         ){
 
             return null;
@@ -1378,9 +1629,9 @@ function detectDocument(sourceCanvas){
 
 
         candidates.sort(
-            function(a,b){
-                return b.score - a.score;
-            }
+            (a,b) =>
+                b.score -
+                a.score
         );
 
 
@@ -1388,40 +1639,38 @@ function detectDocument(sourceCanvas){
             candidates[0];
 
 
-        /*
-        Convert coordinates from
-        resized OpenCV image back
-        to original photo.
-        */
-
         const scaleX =
-            sourceCanvas.width /
+            canvas.width /
             src.cols;
 
 
         const scaleY =
-            sourceCanvas.height /
+            canvas.height /
             src.rows;
 
 
         return best.points.map(
-            function(point){
+            p => ({
 
-                return {
-                    x: point.x * scaleX,
-                    y: point.y * scaleY
-                };
+                x:
+                    p.x *
+                    scaleX,
 
-            }
+                y:
+                    p.y *
+                    scaleY
+
+            })
         );
 
     }
     catch(error){
 
         console.error(
-            "Document detection error:",
+            "Detection error:",
             error
         );
+
 
         return null;
 
@@ -1440,248 +1689,570 @@ function detectDocument(sourceCanvas){
 }
 
 
-/* ------------------------------------------------------------
-   PERSPECTIVE CORRECTION
-   ------------------------------------------------------------ */
+/* ============================================================
+   PERSPECTIVE CROP
+   ============================================================ */
 
 function perspectiveCrop(
-    sourceCanvas,
+    canvas,
     points
 ){
 
-    return new Promise(
-        function(resolve,reject){
-
-            let src = null;
-            let dst = null;
-            let matrix = null;
-            let srcPoints = null;
-            let dstPoints = null;
+    let src = null;
+    let dst = null;
+    let matrix = null;
+    let srcPoints = null;
+    let dstPoints = null;
 
 
-            try{
+    try{
 
-                const ordered =
-                    orderPoints(
-                        points
-                    );
-
-
-                const tl = ordered[0];
-                const tr = ordered[1];
-                const br = ordered[2];
-                const bl = ordered[3];
+        const ordered =
+            orderPoints(
+                points
+            );
 
 
-                const topWidth =
-                    distance(
-                        tl,
-                        tr
-                    );
+        const tl =
+            ordered[0];
+
+        const tr =
+            ordered[1];
+
+        const br =
+            ordered[2];
+
+        const bl =
+            ordered[3];
 
 
-                const bottomWidth =
-                    distance(
-                        bl,
-                        br
-                    );
+        const width =
+            Math.round(
+                Math.max(
+                    distance(tl,tr),
+                    distance(bl,br)
+                )
+            );
 
 
-                const leftHeight =
-                    distance(
-                        tl,
-                        bl
-                    );
+        const height =
+            Math.round(
+                Math.max(
+                    distance(tl,bl),
+                    distance(tr,br)
+                )
+            );
 
 
-                const rightHeight =
-                    distance(
-                        tr,
-                        br
-                    );
+        /*
+        Keep plenty of resolution.
+        */
+
+        const maxSize =
+            3000;
 
 
-                let outputWidth =
-                    Math.round(
-                        Math.max(
-                            topWidth,
-                            bottomWidth
-                        )
-                    );
+        let outWidth =
+            width;
 
 
-                let outputHeight =
-                    Math.round(
-                        Math.max(
-                            leftHeight,
-                            rightHeight
-                        )
-                    );
+        let outHeight =
+            height;
 
 
-                /*
-                Safety limit.
-                */
-
-                const maxOutput =
-                    2600;
-
-
-                const biggest =
-                    Math.max(
-                        outputWidth,
-                        outputHeight
-                    );
+        const largest =
+            Math.max(
+                outWidth,
+                outHeight
+            );
 
 
-                if(
-                    biggest > maxOutput
-                ){
+        if(
+            largest >
+            maxSize
+        ){
 
-                    const scale =
-                        maxOutput / biggest;
-
-                    outputWidth =
-                        Math.round(
-                            outputWidth * scale
-                        );
-
-                    outputHeight =
-                        Math.round(
-                            outputHeight * scale
-                        );
-                }
+            const scale =
+                maxSize /
+                largest;
 
 
-                src =
-                    cv.imread(
-                        sourceCanvas
-                    );
-
-
-                srcPoints =
-                    cv.matFromArray(
-                        4,
-                        1,
-                        cv.CV_32FC2,
-                        [
-                            tl.x,tl.y,
-                            tr.x,tr.y,
-                            br.x,br.y,
-                            bl.x,bl.y
-                        ]
-                    );
-
-
-                dstPoints =
-                    cv.matFromArray(
-                        4,
-                        1,
-                        cv.CV_32FC2,
-                        [
-                            0,0,
-                            outputWidth,0,
-                            outputWidth,outputHeight,
-                            0,outputHeight
-                        ]
-                    );
-
-
-                matrix =
-                    cv.getPerspectiveTransform(
-                        srcPoints,
-                        dstPoints
-                    );
-
-
-                dst =
-                    new cv.Mat();
-
-
-                cv.warpPerspective(
-                    src,
-                    dst,
-                    matrix,
-                    new cv.Size(
-                        outputWidth,
-                        outputHeight
-                    ),
-                    cv.INTER_CUBIC,
-                    cv.BORDER_REPLICATE
+            outWidth =
+                Math.round(
+                    outWidth *
+                    scale
                 );
 
 
-                const canvas =
-                    document.createElement(
-                        "canvas"
-                    );
-
-
-                canvas.width =
-                    outputWidth;
-
-                canvas.height =
-                    outputHeight;
-
-
-                cv.imshow(
-                    canvas,
-                    dst
+            outHeight =
+                Math.round(
+                    outHeight *
+                    scale
                 );
-
-
-                /*
-                The document should be
-                landscape.
-
-                If the detected rectangle
-                was portrait, rotate it.
-                */
-
-                let finalCanvas =
-                    canvas;
-
-
-                if(
-                    finalCanvas.height >
-                    finalCanvas.width
-                ){
-
-                    finalCanvas =
-                        rotateClockwise(
-                            finalCanvas
-                        );
-                }
-
-
-                resolve(
-                    finalCanvas
-                );
-
-            }
-            catch(error){
-
-                reject(error);
-
-            }
-            finally{
-
-                if(src) src.delete();
-                if(dst) dst.delete();
-                if(matrix) matrix.delete();
-                if(srcPoints) srcPoints.delete();
-                if(dstPoints) dstPoints.delete();
-
-            }
 
         }
-    );
+
+
+        src =
+            cv.imread(
+                canvas
+            );
+
+
+        srcPoints =
+            cv.matFromArray(
+                4,
+                1,
+                cv.CV_32FC2,
+                [
+
+                    tl.x,
+                    tl.y,
+
+                    tr.x,
+                    tr.y,
+
+                    br.x,
+                    br.y,
+
+                    bl.x,
+                    bl.y
+
+                ]
+            );
+
+
+        dstPoints =
+            cv.matFromArray(
+                4,
+                1,
+                cv.CV_32FC2,
+                [
+
+                    0,
+                    0,
+
+                    outWidth,
+                    0,
+
+                    outWidth,
+                    outHeight,
+
+                    0,
+                    outHeight
+
+                ]
+            );
+
+
+        matrix =
+            cv.getPerspectiveTransform(
+                srcPoints,
+                dstPoints
+            );
+
+
+        dst =
+            new cv.Mat();
+
+
+        cv.warpPerspective(
+            src,
+            dst,
+            matrix,
+            new cv.Size(
+                outWidth,
+                outHeight
+            ),
+            cv.INTER_CUBIC,
+            cv.BORDER_REPLICATE
+        );
+
+
+        const output =
+            document.createElement(
+                "canvas"
+            );
+
+
+        output.width =
+            outWidth;
+
+
+        output.height =
+            outHeight;
+
+
+        cv.imshow(
+            output,
+            dst
+        );
+
+
+        /*
+        Normalize 90°/270° using
+        physical card geometry.
+
+        Aadhaar is landscape.
+        */
+
+        if(
+            output.height >
+            output.width
+        ){
+
+            return rotate90(
+                output
+            );
+        }
+
+
+        return output;
+
+    }
+    finally{
+
+        if(src) src.delete();
+        if(dst) dst.delete();
+        if(matrix) matrix.delete();
+        if(srcPoints) srcPoints.delete();
+        if(dstPoints) dstPoints.delete();
+
+    }
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
+   OCR ORIENTATION
+   ============================================================ */
+
+/*
+   IMPORTANT:
+
+   We crop first.
+
+   Then we test 0°, 90°, 180°, 270°.
+
+   Tesseract receives a small working copy,
+   while the selected rotation is applied
+   to the full-resolution crop.
+
+   This keeps quality high.
+*/
+
+async function scoreOrientation(
+    canvas
+){
+
+    const Tesseract =
+        await loadTesseract();
+
+
+    const worker =
+        await Tesseract.createWorker(
+            "eng"
+        );
+
+
+    try{
+
+        const result =
+            await worker.recognize(
+                canvas,
+                {
+                    rotateAuto:true
+                }
+            );
+
+
+        const confidence =
+            result &&
+            result.data &&
+            typeof result.data.confidence ===
+                "number"
+            ? result.data.confidence
+            : 0;
+
+
+        const text =
+            result &&
+            result.data &&
+            result.data.text
+            ? result.data.text
+            : "";
+
+
+        /*
+        Confidence + amount of usable text.
+        */
+
+        const usefulCharacters =
+            text
+                .replace(
+                    /[^A-Za-z0-9]/g,
+                    ""
+                )
+                .length;
+
+
+        const score =
+            confidence +
+            Math.min(
+                usefulCharacters,
+                80
+            ) * 0.35;
+
+
+        return {
+            score:score,
+            confidence:confidence,
+            text:text
+        };
+
+    }
+    finally{
+
+        await worker.terminate();
+
+    }
+}
+
+
+/*
+   We don't actually need OCR to run on all four
+   huge images.
+
+   First make a smaller analysis copy.
+*/
+
+function makeAnalysisCanvas(
+    canvas
+){
+
+    const maxWidth =
+        1200;
+
+
+    const scale =
+        Math.min(
+            1,
+            maxWidth /
+            canvas.width
+        );
+
+
+    const output =
+        document.createElement(
+            "canvas"
+        );
+
+
+    output.width =
+        Math.round(
+            canvas.width *
+            scale
+        );
+
+
+    output.height =
+        Math.round(
+            canvas.height *
+            scale
+        );
+
+
+    const ctx =
+        output.getContext(
+            "2d"
+        );
+
+
+    ctx.drawImage(
+        canvas,
+        0,
+        0,
+        output.width,
+        output.height
+    );
+
+
+    return output;
+}
+
+
+/*
+   OCR engine's rotateAuto result is used as a
+   signal, but we explicitly test orientations.
+
+   This prevents us from relying on a single
+   orientation guess.
+*/
+
+async function chooseOrientation(
+    canvas
+){
+
+    const orientations = [
+
+        {
+            degrees:0,
+            image:canvas
+        },
+
+        {
+            degrees:90,
+            image:rotate90(canvas)
+        },
+
+        {
+            degrees:180,
+            image:rotate180(canvas)
+        },
+
+        {
+            degrees:270,
+            image:rotate270(canvas)
+        }
+
+    ];
+
+
+    const results = [];
+
+
+    for(
+        const item of orientations
+    ){
+
+        const analysis =
+            makeAnalysisCanvas(
+                item.image
+            );
+
+
+        const result =
+            await scoreOrientation(
+                analysis
+            );
+
+
+        results.push({
+
+            degrees:
+                item.degrees,
+
+            score:
+                result.score,
+
+            confidence:
+                result.confidence,
+
+            text:
+                result.text
+
+        });
+
+    }
+
+
+    results.sort(
+        (a,b) =>
+            b.score -
+            a.score
+    );
+
+
+    const best =
+        results[0];
+
+
+    const second =
+        results[1];
+
+
+    /*
+    Only trust orientation if there is
+    a meaningful difference.
+
+    Otherwise don't randomly rotate.
+    */
+
+    const difference =
+        best.score -
+        second.score;
+
+
+    const confident =
+        best.confidence >= 35 &&
+        difference >= 8;
+
+
+    return {
+
+        degrees:
+            confident
+            ? best.degrees
+            : 0,
+
+        confident:
+            confident,
+
+        confidence:
+            best.confidence,
+
+        results:
+            results
+
+    };
+}
+
+
+/* ============================================================
+   APPLY ORIENTATION
+   ============================================================ */
+
+function applyOrientation(
+    canvas,
+    degrees
+){
+
+    if(
+        degrees === 90
+    ){
+
+        return rotate90(
+            canvas
+        );
+    }
+
+
+    if(
+        degrees === 180
+    ){
+
+        return rotate180(
+            canvas
+        );
+    }
+
+
+    if(
+        degrees === 270
+    ){
+
+        return rotate270(
+            canvas
+        );
+    }
+
+
+    return canvas;
+}
+
+
+/* ============================================================
    PROCESS UPLOAD
-   ------------------------------------------------------------ */
+   ============================================================ */
 
 async function processUpload(
     side,
@@ -1707,18 +2278,24 @@ async function processUpload(
             );
 
 
-        if(side === "front"){
-            frontOriginal = original;
+        if(
+            side === "front"
+        ){
+
+            frontOriginal =
+                original;
+
         }
         else{
-            backOriginal = original;
+
+            backOriginal =
+                original;
+
         }
 
 
         /*
-        Show original immediately.
-        This means the app remains useful
-        even if the scanner engine fails.
+        Show something immediately.
         */
 
         updatePreview(
@@ -1729,7 +2306,7 @@ async function processUpload(
 
         setStatus(
             side,
-            "Photo loaded. Starting document scanner…"
+            "Photo loaded."
         );
 
 
@@ -1745,22 +2322,30 @@ async function processUpload(
         }
         catch(error){
 
-            console.warn(
+            console.error(
                 error
             );
 
 
-            if(side === "front"){
-                frontDocument = original;
+            if(
+                side === "front"
+            ){
+
+                frontDocument =
+                    original;
+
             }
             else{
-                backDocument = original;
+
+                backDocument =
+                    original;
+
             }
 
 
             setStatus(
                 side,
-                "Automatic scanner unavailable. Use Adjust corners."
+                "Scanner unavailable. Use Adjust corners."
             );
 
 
@@ -1769,7 +2354,7 @@ async function processUpload(
 
 
         showLoading(
-            "Detecting document…"
+            "Finding Aadhaar card…"
         );
 
 
@@ -1781,17 +2366,25 @@ async function processUpload(
 
         if(!points){
 
-            if(side === "front"){
-                frontDocument = original;
+            if(
+                side === "front"
+            ){
+
+                frontDocument =
+                    original;
+
             }
             else{
-                backDocument = original;
+
+                backDocument =
+                    original;
+
             }
 
 
             setStatus(
                 side,
-                "Document not detected automatically. Use Adjust corners."
+                "Card not detected automatically. Use Adjust corners."
             );
 
 
@@ -1800,22 +2393,108 @@ async function processUpload(
 
 
         showLoading(
-            "Straightening document…"
+            "Cropping and straightening…"
         );
 
 
-        const cropped =
-            await perspectiveCrop(
+        let cropped =
+            perspectiveCrop(
                 original,
                 points
             );
 
 
-        if(side === "front"){
-            frontDocument = cropped;
+        /*
+        OCR only starts AFTER successful crop.
+        */
+
+        showLoading(
+            "Checking orientation…"
+        );
+
+
+        try{
+
+            const orientation =
+                await chooseOrientation(
+                    cropped
+                );
+
+
+            if(
+                orientation.confident
+            ){
+
+                cropped =
+                    applyOrientation(
+                        cropped,
+                        orientation.degrees
+                    );
+
+
+                setStatus(
+                    side,
+                    "Card detected and oriented automatically."
+                );
+
+            }
+            else{
+
+                setStatus(
+                    side,
+                    "Card detected and straightened."
+                );
+
+            }
+
+        }
+        catch(error){
+
+            console.warn(
+                "Orientation check unavailable:",
+                error
+            );
+
+
+            setStatus(
+                side,
+                "Card detected and straightened."
+            );
+
+        }
+
+
+        /*
+        Final geometry normalization.
+
+        Aadhaar card itself is landscape.
+        */
+
+        if(
+            cropped.height >
+            cropped.width
+        ){
+
+            cropped =
+                rotate90(
+                    cropped
+                );
+        }
+
+
+        if(
+            side === "front"
+        ){
+
+            frontDocument =
+                cropped;
+
         }
         else{
-            backDocument = cropped;
+
+            backDocument =
+                cropped;
+
         }
 
 
@@ -1824,24 +2503,18 @@ async function processUpload(
             cropped
         );
 
-
-        setStatus(
-            side,
-            "Document detected, cropped and straightened."
-        );
-
     }
     catch(error){
 
         console.error(
-            "PrintReady processing error:",
+            "PrintReady error:",
             error
         );
 
 
         setStatus(
             side,
-            "Could not process this photo. Please try again."
+            "Could not process this photo."
         );
 
     }
@@ -1853,12 +2526,14 @@ async function processUpload(
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    FILE INPUTS
-   ------------------------------------------------------------ */
+   ============================================================ */
 
 document
-    .getElementById("frontInput")
+    .getElementById(
+        "frontInput"
+    )
     .addEventListener(
         "change",
         function(){
@@ -1872,6 +2547,7 @@ document
                     "front",
                     this.files[0]
                 );
+
             }
 
         }
@@ -1879,7 +2555,9 @@ document
 
 
 document
-    .getElementById("backInput")
+    .getElementById(
+        "backInput"
+    )
     .addEventListener(
         "change",
         function(){
@@ -1893,65 +2571,75 @@ document
                     "back",
                     this.files[0]
                 );
+
             }
 
         }
     );
 
 
-/* ------------------------------------------------------------
-   ROTATION
-   ------------------------------------------------------------ */
+/* ============================================================
+   MANUAL ROTATION
+   ============================================================ */
 
 function rotateDocument(side){
 
-    let canvas = null;
-
-
-    if(side === "front"){
+    if(
+        side === "front"
+    ){
 
         if(!frontDocument)
             return;
 
-        canvas =
-            rotateClockwise(
+
+        frontDocument =
+            rotate90(
                 frontDocument
             );
 
-        frontDocument =
-            canvas;
+
+        updatePreview(
+            "front",
+            frontDocument
+        );
+
+
+        setStatus(
+            "front",
+            "Rotated 90°."
+        );
+
     }
     else{
 
         if(!backDocument)
             return;
 
-        canvas =
-            rotateClockwise(
+
+        backDocument =
+            rotate90(
                 backDocument
             );
 
-        backDocument =
-            canvas;
+
+        updatePreview(
+            "back",
+            backDocument
+        );
+
+
+        setStatus(
+            "back",
+            "Rotated 90°."
+        );
+
     }
-
-
-    updatePreview(
-        side,
-        canvas
-    );
-
-
-    setStatus(
-        side,
-        "Rotated 90°."
-    );
 }
 
 
-/* ------------------------------------------------------------
-   MANUAL CORNER EDITOR
-   ------------------------------------------------------------ */
+/* ============================================================
+   MANUAL EDITOR
+   ============================================================ */
 
 function openManualEditor(side){
 
@@ -1982,71 +2670,78 @@ function openManualEditor(side){
         );
 
 
-    const availableWidth =
-        editor.clientWidth || 580;
+    const width =
+        editor.clientWidth ||
+        580;
 
 
     const scale =
         Math.min(
             1,
-            availableWidth /
+            width /
             original.width
         );
 
 
     canvas.width =
         Math.round(
-            original.width * scale
+            original.width *
+            scale
         );
 
 
     canvas.height =
         Math.round(
-            original.height * scale
+            original.height *
+            scale
         );
 
 
-    const ctx =
-        canvas.getContext("2d");
+    canvas
+        .getContext("2d")
+        .drawImage(
+            original,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
 
 
-    ctx.drawImage(
-        original,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    const mx =
+        canvas.width *
+        0.08;
 
 
-    const marginX =
-        canvas.width * 0.08;
-
-
-    const marginY =
-        canvas.height * 0.12;
+    const my =
+        canvas.height *
+        0.12;
 
 
     const points = [
 
         {
-            x:marginX,
-            y:marginY
+            x:mx,
+            y:my
         },
 
         {
-            x:canvas.width-marginX,
-            y:marginY
+            x:
+                canvas.width - mx,
+            y:my
         },
 
         {
-            x:canvas.width-marginX,
-            y:canvas.height-marginY
+            x:
+                canvas.width - mx,
+            y:
+                canvas.height - my
         },
 
         {
-            x:marginX,
-            y:canvas.height-marginY
+            x:mx,
+            y:
+                canvas.height - my
         }
 
     ];
@@ -2087,7 +2782,7 @@ function attachCornerDrag(
 ){
 
     if(
-        element.dataset.dragReady ===
+        element.dataset.ready ===
         "yes"
     ){
 
@@ -2095,22 +2790,26 @@ function attachCornerDrag(
     }
 
 
-    element.dataset.dragReady =
+    element.dataset.ready =
         "yes";
 
 
-    let dragging = false;
+    let dragging =
+        false;
 
 
     element.addEventListener(
         "pointerdown",
         function(event){
 
-            dragging = true;
+            dragging =
+                true;
+
 
             element.setPointerCapture(
                 event.pointerId
             );
+
 
             event.preventDefault();
 
@@ -2175,7 +2874,8 @@ function attachCornerDrag(
         "pointerup",
         function(){
 
-            dragging = false;
+            dragging =
+                false;
 
         }
     );
@@ -2185,16 +2885,17 @@ function attachCornerDrag(
         "pointercancel",
         function(){
 
-            dragging = false;
+            dragging =
+                false;
 
         }
     );
 }
 
 
-/* ------------------------------------------------------------
-   APPLY MANUAL CROP
-   ------------------------------------------------------------ */
+/* ============================================================
+   MANUAL CROP
+   ============================================================ */
 
 async function applyManualCrop(side){
 
@@ -2218,8 +2919,8 @@ async function applyManualCrop(side){
 
 
     for(
-        let i = 1;
-        i <= 4;
+        let i=1;
+        i<=4;
         i++
     ){
 
@@ -2244,36 +2945,31 @@ async function applyManualCrop(side){
                 )
 
         });
+
     }
 
 
-    const scaleX =
+    const sx =
         original.width /
         canvas.width;
 
 
-    const scaleY =
+    const sy =
         original.height /
         canvas.height;
 
 
     const realPoints =
         points.map(
-            function(point){
+            p => ({
 
-                return {
+                x:
+                    p.x * sx,
 
-                    x:
-                        point.x *
-                        scaleX,
+                y:
+                    p.y * sy
 
-                    y:
-                        point.y *
-                        scaleY
-
-                };
-
-            }
+            })
         );
 
 
@@ -2287,18 +2983,72 @@ async function applyManualCrop(side){
         await loadOpenCV();
 
 
-        const cropped =
-            await perspectiveCrop(
+        let cropped =
+            perspectiveCrop(
                 original,
                 realPoints
             );
 
 
-        if(side === "front"){
-            frontDocument = cropped;
+        showLoading(
+            "Checking orientation…"
+        );
+
+
+        try{
+
+            const orientation =
+                await chooseOrientation(
+                    cropped
+                );
+
+
+            if(
+                orientation.confident
+            ){
+
+                cropped =
+                    applyOrientation(
+                        cropped,
+                        orientation.degrees
+                    );
+            }
+
+        }
+        catch(error){
+
+            console.warn(
+                error
+            );
+
+        }
+
+
+        if(
+            cropped.height >
+            cropped.width
+        ){
+
+            cropped =
+                rotate90(
+                    cropped
+                );
+        }
+
+
+        if(
+            side === "front"
+        ){
+
+            frontDocument =
+                cropped;
+
         }
         else{
-            backDocument = cropped;
+
+            backDocument =
+                cropped;
+
         }
 
 
@@ -2331,7 +3081,7 @@ async function applyManualCrop(side){
 
         setStatus(
             side,
-            "Could not apply the crop."
+            "Could not apply crop."
         );
 
     }
@@ -2343,9 +3093,9 @@ async function applyManualCrop(side){
 }
 
 
-/* ------------------------------------------------------------
-   A4 PDF
-   ------------------------------------------------------------ */
+/* ============================================================
+   PDF
+   ============================================================ */
 
 function addDocumentToA4(
     pdf,
@@ -2370,7 +3120,10 @@ function addDocumentToA4(
         ratio;
 
 
-    if(height > maxHeight){
+    if(
+        height >
+        maxHeight
+    ){
 
         height =
             maxHeight;
@@ -2379,39 +3132,41 @@ function addDocumentToA4(
         width =
             height *
             ratio;
+
     }
 
 
     const centeredX =
         x +
-        (maxWidth - width) /
-        2;
+        (
+            maxWidth -
+            width
+        ) / 2;
 
 
-    const imageData =
-        canvas.toDataURL(
-            "image/jpeg",
-            0.95
-        );
+    /*
+    PNG is used instead of JPEG here.
 
+    This preserves text/detail better.
+    */
 
     pdf.addImage(
-        imageData,
-        "JPEG",
+        canvas,
+        "PNG",
         centeredX,
         y,
         width,
-        height
+        height,
+        undefined,
+        "FAST"
     );
 }
 
 
-/* ------------------------------------------------------------
-   CREATE PDF
-   ------------------------------------------------------------ */
-
 document
-    .getElementById("createPdf")
+    .getElementById(
+        "createPdf"
+    )
     .addEventListener(
         "click",
         async function(){
@@ -2452,14 +3207,25 @@ document
                             "mm",
 
                         format:
-                            "a4"
+                            "a4",
+
+                        compress:
+                            true
 
                     });
 
 
-                const pageWidth = 210;
-                const pageHeight = 297;
-                const margin = 10;
+                const pageWidth =
+                    210;
+
+
+                const pageHeight =
+                    297;
+
+
+                const margin =
+                    10;
+
 
                 const usableWidth =
                     pageWidth -
@@ -2471,7 +3237,8 @@ document
                     backDocument
                 ){
 
-                    const gap = 8;
+                    const gap =
+                        8;
 
 
                     const slotHeight =
@@ -2515,6 +3282,7 @@ document
                         pageHeight -
                         margin * 2
                     );
+
                 }
 
 
@@ -2532,7 +3300,7 @@ document
 
 
                 alert(
-                    "Could not create the PDF. Please try again."
+                    "Could not create the PDF."
                 );
 
             }
@@ -2546,12 +3314,8 @@ document
     );
 
 
-/* ------------------------------------------------------------
-   INITIAL STATE
-   ------------------------------------------------------------ */
-
 console.log(
-    "PrintReady loaded successfully."
+    "PrintReady ready."
 );
 
 </script>
