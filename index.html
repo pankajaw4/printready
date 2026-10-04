@@ -1,1165 +1,732 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>PrintReady</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f7fb">
+<title>PrintReady — Aadhaar to A4 PDF</title>
 
 <style>
-
-*{
-    box-sizing:border-box;
-}
-
-html,
-body{
-    margin:0;
-    padding:0;
-    min-height:100%;
-}
+*{box-sizing:border-box}
 
 body{
-    background:#f5f7fb;
-    color:#111827;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
+  margin:0;
+  background:#f5f7fb;
+  color:#111827;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif
 }
 
 .container{
-    width:100%;
-    max-width:620px;
-    margin:0 auto;
-    padding:24px 16px 50px;
+  max-width:680px;
+  margin:auto;
+  padding:28px 18px 50px
 }
 
-header{
-    margin-bottom:24px;
+h1{
+  font-size:40px;
+  margin:0 0 8px;
+  letter-spacing:-1.5px
 }
 
-.logo{
-    font-size:31px;
-    font-weight:800;
-    letter-spacing:-1.2px;
-}
-
-.tagline{
-    margin-top:6px;
-    color:#6b7280;
-    font-size:15px;
+.subtitle{
+  margin:0 0 24px;
+  color:#667085;
+  font-size:17px;
+  line-height:1.5
 }
 
 .card{
-    background:#fff;
-    border-radius:22px;
-    padding:22px;
-    margin-bottom:18px;
-    box-shadow:0 8px 30px rgba(15,23,42,.06);
+  background:#fff;
+  border-radius:22px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 7px 25px rgba(16,24,40,.06)
 }
 
-.card h2{
-    margin:0 0 7px;
-    font-size:20px;
+h2{
+  margin:0 0 7px;
+  font-size:23px
 }
 
-.card p{
-    margin:0 0 16px;
-    color:#6b7280;
-    font-size:14px;
-    line-height:1.55;
+.help{
+  margin:0 0 17px;
+  color:#667085;
+  line-height:1.5
 }
 
 .upload{
-    width:100%;
-    min-height:76px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:2px dashed #cbd5e1;
-    border-radius:17px;
-    background:#f8fafc;
-    color:#111827;
-    font-size:16px;
-    font-weight:600;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-}
-
-.upload:active{
-    background:#eef2f7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:125px;
+  border:2px dashed #cbd5e1;
+  border-radius:18px;
+  background:#fafbfc;
+  text-align:center;
+  font-weight:700;
+  font-size:17px;
+  padding:20px;
+  cursor:pointer
 }
 
 .upload input{
-    display:none;
+  display:none
 }
 
 .preview{
-    width:100%;
-    max-height:520px;
-    object-fit:contain;
-    display:block;
-    margin-top:16px;
-    border-radius:15px;
-    background:#f1f5f9;
+  display:block;
+  width:100%;
+  max-height:520px;
+  object-fit:contain;
+  background:#eef1f5;
+  border-radius:16px;
+  margin-top:15px
 }
 
 .status{
-    margin-top:10px;
-    color:#64748b;
-    font-size:13px;
-    line-height:1.5;
+  min-height:22px;
+  margin-top:10px;
+  color:#667085;
+  font-size:14px;
+  line-height:1.45
+}
+
+.error{
+  color:#b42318
 }
 
 .actions{
-    display:flex;
-    gap:9px;
-    margin-top:12px;
-    flex-wrap:wrap;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px
 }
 
 button{
-    border:0;
-    border-radius:14px;
-    padding:13px 17px;
-    font-size:15px;
-    font-weight:700;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
+  border:0;
+  border-radius:14px;
+  padding:13px 16px;
+  font-size:15px;
+  font-weight:750;
+  cursor:pointer
 }
 
 .primary{
-    width:100%;
-    padding:17px;
-    background:#111827;
-    color:#fff;
-    font-size:16px;
+  background:#303b9b;
+  color:#fff
 }
 
 .secondary{
-    background:#eef2ff;
-    color:#3730a3;
+  background:#eef1ff;
+  color:#303b9b
+}
+
+button:disabled{
+  opacity:.45
 }
 
 .info{
-    padding:16px;
-    border-radius:16px;
-    background:#eff6ff;
-    color:#1e40af;
-    font-size:13px;
-    line-height:1.55;
+  background:#f0f4ff;
+  border-radius:16px;
+  padding:15px 16px;
+  color:#344054;
+  font-size:14px;
+  line-height:1.55
+}
+
+#pdfButton{
+  width:100%;
+  font-size:17px;
+  padding:16px;
+  margin-top:12px
 }
 
 .hidden{
-    display:none!important;
+  display:none!important
 }
 
 #loading{
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    background:rgba(255,255,255,.94);
-    display:flex;
-    align-items:center;
-    justify-content:center;
+  position:fixed;
+  z-index:99;
+  inset:0;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(6px);
+  display:flex;
+  align-items:center;
+  justify-content:center
 }
 
-.loaderBox{
-    width:min(300px,90vw);
-    padding:27px;
-    border-radius:20px;
-    background:#fff;
-    text-align:center;
-    box-shadow:0 15px 50px rgba(0,0,0,.16);
+.loadingBox{
+  background:#fff;
+  border-radius:24px;
+  padding:28px;
+  text-align:center;
+  width:min(330px,calc(100% - 40px));
+  box-shadow:0 18px 55px rgba(0,0,0,.18)
 }
 
 .spinner{
-    width:38px;
-    height:38px;
-    margin:0 auto 15px;
-    border-radius:50%;
-    border:4px solid #e5e7eb;
-    border-top-color:#111827;
-    animation:spin .8s linear infinite;
+  width:48px;
+  height:48px;
+  border:6px solid #e5e7eb;
+  border-top-color:#303b9b;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  margin:auto auto 17px
 }
 
 @keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
+  to{transform:rotate(360deg)}
 }
 
-.manualEditor{
-    position:relative;
-    margin-top:15px;
-    overflow:hidden;
-    border-radius:16px;
-    background:#111827;
+.loadingText{
+  font-weight:700;
+  font-size:17px
 }
 
-.manualCanvas{
-    width:100%;
-    display:block;
+.small{
+  font-size:13px;
+  color:#667085;
+  margin-top:7px
 }
 
-.manualHelp{
-    padding:12px;
-    background:#1f2937;
-    color:#fff;
-    font-size:13px;
-    line-height:1.4;
+.editor{
+  position:relative;
+  margin-top:14px;
+  background:#111;
+  border-radius:16px;
+  overflow:hidden;
+  touch-action:none
+}
+
+.editor canvas{
+  display:block;
+  width:100%
 }
 
 .corner{
-    position:absolute;
-    width:27px;
-    height:27px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background:#2563eb;
-    border:3px solid white;
-    box-shadow:0 2px 8px rgba(0,0,0,.3);
-    touch-action:none;
+  position:absolute;
+  width:28px;
+  height:28px;
+  margin:-14px;
+  border-radius:50%;
+  background:#fff;
+  border:4px solid #303b9b;
+  box-shadow:0 2px 9px #0008;
+  touch-action:none
 }
 
-.engineStatus{
-    margin-top:10px;
-    color:#94a3b8;
-    font-size:12px;
+.footer{
+  text-align:center;
+  color:#98a2b3;
+  font-size:13px;
+  margin-top:24px
 }
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <div id="loading" class="hidden">
+  <div class="loadingBox">
+    <div class="spinner"></div>
+    <div id="loadingText" class="loadingText">Processing…</div>
+    <div class="small">Your document stays in your browser.</div>
+  </div>
+</div>
 
-    <div class="loaderBox">
+<main class="container">
 
-        <div class="spinner"></div>
+<h1>PrintReady</h1>
 
-        <div id="loadingText">
-            Processing…
-        </div>
+<p class="subtitle">
+Create a clean, print-ready A4 PDF from the front and back photos of your Aadhaar card.
+</p>
 
-    </div>
+<section class="card">
+
+<h2>Front side</h2>
+
+<p class="help">
+Choose an existing photo from your phone. The original photo will appear immediately.
+</p>
+
+<label class="upload">
+<input id="frontInput" type="file" accept="image/*">
+<span>📄 &nbsp; Choose front-side photo</span>
+</label>
+
+<img id="frontPreview" class="preview hidden" alt="Front side">
+
+<div id="frontStatus" class="status"></div>
+
+<div id="frontActions" class="actions hidden">
+
+<button id="front90" class="secondary" type="button">
+Rotate 90°
+</button>
+
+<button id="front180" class="secondary" type="button">
+Rotate 180°
+</button>
+
+<button id="frontManual" class="secondary" type="button">
+Adjust corners
+</button>
 
 </div>
 
+<div id="frontEditorWrap" class="hidden">
 
-<div class="container">
+<div id="frontEditor" class="editor">
+<canvas id="frontEditorCanvas"></canvas>
+</div>
 
+<div class="small">
+Drag the four points to the four corners of the card.
+</div>
 
-<header>
+<div class="actions">
 
-    <div class="logo">
-        PrintReady
-    </div>
+<button id="frontApply" class="primary" type="button">
+Apply crop
+</button>
 
-    <div class="tagline">
-        Turn document photos into clean, print-ready PDFs.
-    </div>
-
-</header>
-
-
-<!-- FRONT -->
-
-<div class="card">
-
-    <h2>Front side</h2>
-
-    <p>
-        Select an existing photo. PrintReady will detect,
-        crop, straighten and orient the document.
-    </p>
-
-    <label class="upload">
-
-        <input
-            id="frontInput"
-            type="file"
-            accept="image/*"
-        >
-
-        📄 Choose front-side photo
-
-    </label>
-
-
-    <img
-        id="frontPreview"
-        class="preview hidden"
-        alt="Front preview"
-    >
-
-
-    <div
-        id="frontStatus"
-        class="status"
-    ></div>
-
-
-    <div
-        id="frontActions"
-        class="actions hidden"
-    >
-
-        <button
-            class="secondary"
-            onclick="rotateDocument('front')"
-        >
-            Rotate 90°
-        </button>
-
-
-        <button
-            class="secondary"
-            onclick="openManualEditor('front')"
-        >
-            Adjust corners
-        </button>
-
-    </div>
-
-
-    <div
-        id="frontEditor"
-        class="hidden"
-    >
-
-        <div class="manualEditor">
-
-            <canvas
-                id="frontCanvas"
-                class="manualCanvas"
-            ></canvas>
-
-
-            <div
-                id="frontCorner1"
-                class="corner"
-            ></div>
-
-            <div
-                id="frontCorner2"
-                class="corner"
-            ></div>
-
-            <div
-                id="frontCorner3"
-                class="corner"
-            ></div>
-
-            <div
-                id="frontCorner4"
-                class="corner"
-            ></div>
-
-
-            <div class="manualHelp">
-                Drag the blue points onto the four corners
-                of the document.
-            </div>
-
-        </div>
-
-
-        <div class="actions">
-
-            <button
-                class="primary"
-                onclick="applyManualCrop('front')"
-            >
-                Apply crop
-            </button>
-
-        </div>
-
-    </div>
+<button id="frontCancel" class="secondary" type="button">
+Cancel
+</button>
 
 </div>
 
+</div>
 
-<!-- BACK -->
-
-<div class="card">
-
-    <h2>Back side</h2>
-
-    <p>
-        Optional. Add the back-side photo if you need
-        both sides on one A4 page.
-    </p>
+</section>
 
 
-    <label class="upload">
+<section class="card">
 
-        <input
-            id="backInput"
-            type="file"
-            accept="image/*"
-        >
+<h2>Back side</h2>
 
-        📄 Choose back-side photo
+<p class="help">
+Optional. Add the back photo to place both sides on one A4 page.
+</p>
 
-    </label>
+<label class="upload">
 
+<input id="backInput" type="file" accept="image/*">
 
-    <img
-        id="backPreview"
-        class="preview hidden"
-        alt="Back preview"
-    >
+<span>
+📄 &nbsp; Choose back-side photo
+</span>
 
+</label>
 
-    <div
-        id="backStatus"
-        class="status"
-    ></div>
+<img id="backPreview" class="preview hidden" alt="Back side">
 
+<div id="backStatus" class="status"></div>
 
-    <div
-        id="backActions"
-        class="actions hidden"
-    >
+<div id="backActions" class="actions hidden">
 
-        <button
-            class="secondary"
-            onclick="rotateDocument('back')"
-        >
-            Rotate 90°
-        </button>
+<button id="back90" class="secondary" type="button">
+Rotate 90°
+</button>
 
+<button id="back180" class="secondary" type="button">
+Rotate 180°
+</button>
 
-        <button
-            class="secondary"
-            onclick="openManualEditor('back')"
-        >
-            Adjust corners
-        </button>
-
-    </div>
-
-
-    <div
-        id="backEditor"
-        class="hidden"
-    >
-
-        <div class="manualEditor">
-
-            <canvas
-                id="backCanvas"
-                class="manualCanvas"
-            ></canvas>
-
-
-            <div
-                id="backCorner1"
-                class="corner"
-            ></div>
-
-            <div
-                id="backCorner2"
-                class="corner"
-            ></div>
-
-            <div
-                id="backCorner3"
-                class="corner"
-            ></div>
-
-            <div
-                id="backCorner4"
-                class="corner"
-            ></div>
-
-
-            <div class="manualHelp">
-                Drag the blue points onto the four corners
-                of the document.
-            </div>
-
-        </div>
-
-
-        <div class="actions">
-
-            <button
-                class="primary"
-                onclick="applyManualCrop('back')"
-            >
-                Apply crop
-            </button>
-
-        </div>
-
-    </div>
+<button id="backManual" class="secondary" type="button">
+Adjust corners
+</button>
 
 </div>
 
+<div id="backEditorWrap" class="hidden">
 
-<!-- PDF -->
+<div id="backEditor" class="editor">
+<canvas id="backEditorCanvas"></canvas>
+</div>
 
-<div class="card">
+<div class="small">
+Drag the four points to the four corners of the card.
+</div>
 
-    <h2>A4 layout</h2>
+<div class="actions">
 
-    <p>
-        Your document(s) will be placed neatly on an A4 page.
-    </p>
+<button id="backApply" class="primary" type="button">
+Apply crop
+</button>
 
-
-    <button
-        id="createPdf"
-        class="primary"
-    >
-        Create A4 PDF
-    </button>
-
-
-    <div
-        id="engineStatus"
-        class="engineStatus"
-    >
-        Scanner engine will load when needed.
-    </div>
+<button id="backCancel" class="secondary" type="button">
+Cancel
+</button>
 
 </div>
 
+</div>
+
+</section>
+
+
+<section class="card">
 
 <div class="info">
 
-    🔒 Your photos are processed directly in your browser.
-    They are not uploaded to a PrintReady server.
+<strong>Quality-first.</strong><br>
+
+PrintReady corrects camera orientation, detects the card,
+straightens perspective and creates a high-quality A4 PDF.
+Processing is done locally in the browser.
 
 </div>
 
+<button id="pdfButton" class="primary" type="button" disabled>
+Create A4 PDF
+</button>
 
+</section>
+
+<div class="footer">
+PrintReady • Browser-only processing
 </div>
+
+</main>
 
 
 <script>
 
+"use strict";
+
 
 /* ============================================================
    PRINTREADY
+   ============================================================
+
+   1. User selects an image.
+   2. Image is displayed immediately.
+   3. EXIF/camera orientation is respected.
+   4. OpenCV detects the document.
+   5. Perspective correction straightens it.
+   6. Only 90°/270° correction is automatic.
+   7. No OCR is used.
+   8. Manual crop is available if detection fails.
+   9. Front + back are placed on one A4 page.
    ============================================================ */
 
-let frontOriginal = null;
-let backOriginal = null;
 
-let frontDocument = null;
-let backDocument = null;
+const S = {
+  front:null,
+  back:null,
+  cv:null,
+  pdf:null,
+  manual:null
+};
 
-let openCVPromise = null;
-let tesseractPromise = null;
-let jsPDFPromise = null;
+
+const MAX_SOURCE = 5200;
+const MAX_DETECT = 1800;
+const MAX_OUTPUT = 4200;
 
 
-/* ============================================================
-   UI
-   ============================================================ */
-
-function showLoading(message){
-
-    document
-        .getElementById("loadingText")
-        .textContent = message;
-
-    document
-        .getElementById("loading")
-        .classList
-        .remove("hidden");
+function $(id){
+  return document.getElementById(id);
 }
 
 
-function hideLoading(){
+function loading(text){
 
-    document
-        .getElementById("loading")
-        .classList
-        .add("hidden");
+  $("loadingText").textContent = text;
+
+  $("loading").classList.remove("hidden");
+
 }
 
 
-function setStatus(side,message){
+function done(){
 
-    document
-        .getElementById(side + "Status")
-        .textContent = message;
+  $("loading").classList.add("hidden");
+
 }
 
 
-function updatePreview(side,canvas){
+function status(side,text,error=false){
 
-    const preview =
-        document.getElementById(
-            side + "Preview"
-        );
+  const element = $(side + "Status");
 
+  element.textContent = text || "";
 
-    preview.src =
-        canvas.toDataURL(
-            "image/jpeg",
-            0.96
-        );
+  element.classList.toggle("error",error);
+
+}
 
 
-    preview.classList.remove(
-        "hidden"
+function loadScript(src,test){
+
+  return new Promise((resolve,reject)=>{
+
+    if(test()){
+      resolve();
+      return;
+    }
+
+    let existing =
+      document.querySelector(
+        'script[data-src="' + src + '"]'
+      );
+
+    if(existing){
+
+      existing.addEventListener(
+        "load",
+        ()=>resolve(),
+        {once:true}
+      );
+
+      existing.addEventListener(
+        "error",
+        ()=>reject(
+          new Error("Library failed to load")
+        ),
+        {once:true}
+      );
+
+      return;
+    }
+
+
+    const script = document.createElement("script");
+
+    script.src = src;
+
+    script.async = true;
+
+    script.dataset.src = src;
+
+    script.onload = ()=>resolve();
+
+    script.onerror = ()=>reject(
+      new Error("Library failed to load")
     );
 
+    document.head.appendChild(script);
 
-    document
-        .getElementById(
-            side + "Actions"
-        )
-        .classList
-        .remove("hidden");
+  });
+
+}
+
+
+async function getCV(){
+
+  if(S.cv){
+    return S.cv;
+  }
+
+  await loadScript(
+    "https://docs.opencv.org/4.x/opencv.js",
+    ()=>typeof cv !== "undefined" && cv.Mat
+  );
+
+
+  const start = Date.now();
+
+
+  while(
+    !(typeof cv !== "undefined" && cv.Mat)
+  ){
+
+    if(Date.now()-start > 20000){
+
+      throw new Error("OpenCV timeout");
+
+    }
+
+    await new Promise(
+      resolve=>setTimeout(resolve,100)
+    );
+
+  }
+
+
+  S.cv = cv;
+
+  return cv;
+
+}
+
+
+async function getPDF(){
+
+  if(S.pdf){
+    return S.pdf;
+  }
+
+  await loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+    ()=>!!window.jspdf?.jsPDF
+  );
+
+  S.pdf = window.jspdf.jsPDF;
+
+  return S.pdf;
+
 }
 
 
 /* ============================================================
-   SCRIPT LOADER
+   IMAGE DECODING
    ============================================================ */
 
-function loadScript(src){
 
-    return new Promise(
-        function(resolve,reject){
+async function decodeFile(file){
 
-            const existing =
-                document.querySelector(
-                    'script[src="' + src + '"]'
-                );
+  const url = URL.createObjectURL(file);
 
 
-            if(existing){
+  try{
 
-                if(
-                    existing.dataset.loaded ===
-                    "true"
-                ){
+    if("createImageBitmap" in window){
 
-                    resolve();
+      try{
 
-                    return;
-                }
-
-
-                existing.addEventListener(
-                    "load",
-                    resolve,
-                    {once:true}
-                );
-
-
-                existing.addEventListener(
-                    "error",
-                    reject,
-                    {once:true}
-                );
-
-
-                return;
+        const bitmap =
+          await createImageBitmap(
+            file,
+            {
+              imageOrientation:"from-image"
             }
+          );
 
+        return {
+          source:bitmap,
+          url:url
+        };
 
-            const script =
-                document.createElement(
-                    "script"
-                );
+      }catch(error){
 
+        console.warn(
+          "EXIF-aware bitmap decoding unavailable",
+          error
+        );
 
-            script.src = src;
-            script.async = true;
+      }
 
-
-            script.onload =
-                function(){
-
-                    script.dataset.loaded =
-                        "true";
-
-                    resolve();
-
-                };
-
-
-            script.onerror =
-                function(){
-
-                    reject(
-                        new Error(
-                            "External library failed to load."
-                        )
-                    );
-
-                };
-
-
-            document.head.appendChild(
-                script
-            );
-
-        }
-    );
-}
-
-
-/* ============================================================
-   OPENCV
-   ============================================================ */
-
-async function loadOpenCV(){
-
-    if(
-        typeof cv !== "undefined" &&
-        cv.Mat &&
-        cv.imread &&
-        cv.findContours
-    ){
-
-        return true;
     }
 
 
-    if(openCVPromise){
+    const image =
+      await new Promise((resolve,reject)=>{
 
-        return openCVPromise;
-    }
+        const img = new Image();
 
+        img.onload = ()=>{
+          resolve(img);
+        };
 
-    openCVPromise =
-        (async function(){
+        img.onerror = ()=>{
+          reject(
+            new Error("Image could not be decoded")
+          );
+        };
 
-            document
-                .getElementById(
-                    "engineStatus"
-                )
-                .textContent =
-                    "Loading document scanner…";
+        img.src = url;
 
-
-            await loadScript(
-                "https://docs.opencv.org/4.x/opencv.js"
-            );
+      });
 
 
-            return new Promise(
-                function(resolve,reject){
-
-                    let attempts = 0;
-
-
-                    const timer =
-                        setInterval(
-                            function(){
-
-                                attempts++;
+    return {
+      source:image,
+      url:url
+    };
 
 
-                                if(
-                                    typeof cv !==
-                                        "undefined" &&
-                                    cv.Mat &&
-                                    cv.imread &&
-                                    cv.findContours
-                                ){
+  }catch(error){
 
-                                    clearInterval(
-                                        timer
-                                    );
+    URL.revokeObjectURL(url);
 
+    throw error;
 
-                                    document
-                                        .getElementById(
-                                            "engineStatus"
-                                        )
-                                        .textContent =
-                                            "Document scanner ready.";
+  }
 
-
-                                    resolve(true);
-
-                                    return;
-                                }
-
-
-                                if(
-                                    attempts > 200
-                                ){
-
-                                    clearInterval(
-                                        timer
-                                    );
-
-
-                                    reject(
-                                        new Error(
-                                            "OpenCV initialization timeout."
-                                        )
-                                    );
-                                }
-
-                            },
-                            100
-                        );
-
-                }
-            );
-
-        })();
-
-
-    return openCVPromise;
 }
 
 
-/* ============================================================
-   TESSERACT
-   ============================================================ */
+function sourceCanvas(source){
 
-async function loadTesseract(){
-
-    if(
-        window.Tesseract &&
-        window.Tesseract.createWorker
-    ){
-
-        return window.Tesseract;
-    }
+  const scale =
+    Math.min(
+      1,
+      MAX_SOURCE /
+      Math.max(
+        source.width,
+        source.height
+      )
+    );
 
 
-    if(tesseractPromise){
-
-        return tesseractPromise;
-    }
+  const canvas =
+    document.createElement("canvas");
 
 
-    tesseractPromise =
-        (async function(){
-
-            await loadScript(
-                "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"
-            );
-
-
-            if(
-                !window.Tesseract
-            ){
-
-                throw new Error(
-                    "OCR engine unavailable."
-                );
-            }
+  canvas.width =
+    Math.max(
+      1,
+      Math.round(source.width * scale)
+    );
 
 
-            return window.Tesseract;
+  canvas.height =
+    Math.max(
+      1,
+      Math.round(source.height * scale)
+    );
 
-        })();
+
+  const context =
+    canvas.getContext(
+      "2d",
+      {alpha:false}
+    );
 
 
-    return tesseractPromise;
+  context.imageSmoothingEnabled = true;
+
+  context.imageSmoothingQuality = "high";
+
+
+  context.drawImage(
+    source,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  if(source.close){
+    source.close();
+  }
+
+
+  return canvas;
+
 }
 
 
-/* ============================================================
-   JSPDF
-   ============================================================ */
+function copy(canvas){
 
-async function loadJsPDF(){
+  const result =
+    document.createElement("canvas");
 
-    if(
-        window.jspdf &&
-        window.jspdf.jsPDF
-    ){
+  result.width = canvas.width;
 
-        return window.jspdf.jsPDF;
-    }
+  result.height = canvas.height;
 
+  result
+    .getContext("2d")
+    .drawImage(canvas,0,0);
 
-    if(jsPDFPromise){
+  return result;
 
-        return jsPDFPromise;
-    }
-
-
-    jsPDFPromise =
-        (async function(){
-
-            await loadScript(
-                "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-            );
-
-
-            if(
-                !window.jspdf ||
-                !window.jspdf.jsPDF
-            ){
-
-                throw new Error(
-                    "PDF engine unavailable."
-                );
-            }
-
-
-            return window.jspdf.jsPDF;
-
-        })();
-
-
-    return jsPDFPromise;
-}
-
-
-/* ============================================================
-   IMAGE
-   ============================================================ */
-
-function loadImageFromFile(file){
-
-    return new Promise(
-        function(resolve,reject){
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                function(){
-
-                    const img =
-                        new Image();
-
-
-                    img.onload =
-                        function(){
-
-                            resolve(img);
-
-                        };
-
-
-                    img.onerror =
-                        function(){
-
-                            reject(
-                                new Error(
-                                    "Image could not be loaded."
-                                )
-                            );
-
-                        };
-
-
-                    img.src =
-                        reader.result;
-
-                };
-
-
-            reader.onerror =
-                function(){
-
-                    reject(
-                        new Error(
-                            "Could not read image."
-                        )
-                    );
-
-                };
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-        }
-    );
-}
-
-
-function imageToCanvas(img){
-
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
-
-
-    canvas.width =
-        img.naturalWidth ||
-        img.width;
-
-
-    canvas.height =
-        img.naturalHeight ||
-        img.height;
-
-
-    const ctx =
-        canvas.getContext(
-            "2d"
-        );
-
-
-    ctx.drawImage(
-        img,
-        0,
-        0
-    );
-
-
-    return canvas;
-}
-
-
-function rotate90(canvas){
-
-    const output =
-        document.createElement(
-            "canvas"
-        );
-
-
-    output.width =
-        canvas.height;
-
-
-    output.height =
-        canvas.width;
-
-
-    const ctx =
-        output.getContext(
-            "2d"
-        );
-
-
-    ctx.translate(
-        output.width / 2,
-        output.height / 2
-    );
-
-
-    ctx.rotate(
-        Math.PI / 2
-    );
-
-
-    ctx.drawImage(
-        canvas,
-        -canvas.width / 2,
-        -canvas.height / 2
-    );
-
-
-    return output;
-}
-
-
-function rotate180(canvas){
-
-    const output =
-        document.createElement(
-            "canvas"
-        );
-
-
-    output.width =
-        canvas.width;
-
-
-    output.height =
-        canvas.height;
-
-
-    const ctx =
-        output.getContext(
-            "2d"
-        );
-
-
-    ctx.translate(
-        output.width / 2,
-        output.height / 2
-    );
-
-
-    ctx.rotate(
-        Math.PI
-    );
-
-
-    ctx.drawImage(
-        canvas,
-        -canvas.width / 2,
-        -canvas.height / 2
-    );
-
-
-    return output;
-}
-
-
-function rotate270(canvas){
-
-    const output =
-        document.createElement(
-            "canvas"
-        );
-
-
-    output.width =
-        canvas.height;
-
-
-    output.height =
-        canvas.width;
-
-
-    const ctx =
-        output.getContext(
-            "2d"
-        );
-
-
-    ctx.translate(
-        output.width / 2,
-        output.height / 2
-    );
-
-
-    ctx.rotate(
-        -Math.PI / 2
-    );
-
-
-    ctx.drawImage(
-        canvas,
-        -canvas.width / 2,
-        -canvas.height / 2
-    );
-
-
-    return output;
 }
 
 
@@ -1167,2156 +734,1816 @@ function rotate270(canvas){
    GEOMETRY
    ============================================================ */
 
+
 function distance(a,b){
 
-    return Math.hypot(
-        a.x - b.x,
-        a.y - b.y
+  return Math.hypot(
+    a.x-b.x,
+    a.y-b.y
+  );
+
+}
+
+
+function order(points){
+
+  const sums =
+    points.map(
+      p=>p.x+p.y
     );
-}
 
-
-function orderPoints(points){
-
-    const sums =
-        points.map(
-            p => p.x + p.y
-        );
-
-
-    const diffs =
-        points.map(
-            p => p.x - p.y
-        );
-
-
-    const tl =
-        points[
-            sums.indexOf(
-                Math.min(...sums)
-            )
-        ];
-
-
-    const br =
-        points[
-            sums.indexOf(
-                Math.max(...sums)
-            )
-        ];
-
-
-    const tr =
-        points[
-            diffs.indexOf(
-                Math.max(...diffs)
-            )
-        ];
-
-
-    const bl =
-        points[
-            diffs.indexOf(
-                Math.min(...diffs)
-            )
-        ];
-
-
-    return [
-        tl,
-        tr,
-        br,
-        bl
-    ];
-}
-
-
-/* ============================================================
-   DOCUMENT DETECTOR
-   ============================================================ */
-
-function detectDocument(canvas){
-
-    let src = null;
-    let gray = null;
-    let blur = null;
-    let edges = null;
-    let contours = null;
-    let hierarchy = null;
-    let kernel = null;
-
-
-    try{
-
-        src =
-            cv.imread(
-                canvas
-            );
-
-
-        const maxDimension =
-            1800;
-
-
-        if(
-            Math.max(
-                src.cols,
-                src.rows
-            ) > maxDimension
-        ){
-
-            const scale =
-                maxDimension /
-                Math.max(
-                    src.cols,
-                    src.rows
-                );
-
-
-            const resized =
-                new cv.Mat();
-
-
-            cv.resize(
-                src,
-                resized,
-                new cv.Size(
-                    Math.round(
-                        src.cols *
-                        scale
-                    ),
-                    Math.round(
-                        src.rows *
-                        scale
-                    )
-                ),
-                0,
-                0,
-                cv.INTER_AREA
-            );
-
-
-            src.delete();
-
-            src =
-                resized;
-        }
-
-
-        gray =
-            new cv.Mat();
-
-
-        blur =
-            new cv.Mat();
-
-
-        edges =
-            new cv.Mat();
-
-
-        cv.cvtColor(
-            src,
-            gray,
-            cv.COLOR_RGBA2GRAY
-        );
-
-
-        cv.GaussianBlur(
-            gray,
-            blur,
-            new cv.Size(5,5),
-            0
-        );
-
-
-        cv.Canny(
-            blur,
-            edges,
-            25,
-            110
-        );
-
-
-        kernel =
-            cv.Mat.ones(
-                5,
-                5,
-                cv.CV_8U
-            );
-
-
-        cv.morphologyEx(
-            edges,
-            edges,
-            cv.MORPH_CLOSE,
-            kernel
-        );
-
-
-        kernel.delete();
-
-        kernel = null;
-
-
-        kernel =
-            cv.Mat.ones(
-                3,
-                3,
-                cv.CV_8U
-            );
-
-
-        cv.dilate(
-            edges,
-            edges,
-            kernel
-        );
-
-
-        kernel.delete();
-
-        kernel = null;
-
-
-        contours =
-            new cv.MatVector();
-
-
-        hierarchy =
-            new cv.Mat();
-
-
-        cv.findContours(
-            edges,
-            contours,
-            hierarchy,
-            cv.RETR_LIST,
-            cv.CHAIN_APPROX_SIMPLE
-        );
-
-
-        const imageArea =
-            src.cols *
-            src.rows;
-
-
-        const candidates = [];
-
-
-        for(
-            let i=0;
-            i<contours.size();
-            i++
-        ){
-
-            const contour =
-                contours.get(i);
-
-
-            const area =
-                Math.abs(
-                    cv.contourArea(
-                        contour
-                    )
-                );
-
-
-            const areaRatio =
-                area /
-                imageArea;
-
-
-            /*
-            Allow small cards.
-            */
-
-            if(
-                areaRatio < 0.025 ||
-                areaRatio > 0.93
-            ){
-
-                contour.delete();
-
-                continue;
-            }
-
-
-            const perimeter =
-                cv.arcLength(
-                    contour,
-                    true
-                );
-
-
-            const approx =
-                new cv.Mat();
-
-
-            cv.approxPolyDP(
-                contour,
-                approx,
-                0.02 *
-                perimeter,
-                true
-            );
-
-
-            if(
-                approx.rows === 4
-            ){
-
-                const points = [];
-
-
-                for(
-                    let j=0;
-                    j<4;
-                    j++
-                ){
-
-                    const p =
-                        approx.intPtr(
-                            j,
-                            0
-                        );
-
-
-                    points.push({
-
-                        x:p[0],
-                        y:p[1]
-
-                    });
-
-                }
-
-
-                const ordered =
-                    orderPoints(
-                        points
-                    );
-
-
-                const width =
-                    (
-                        distance(
-                            ordered[0],
-                            ordered[1]
-                        )
-                        +
-                        distance(
-                            ordered[3],
-                            ordered[2]
-                        )
-                    ) / 2;
-
-
-                const height =
-                    (
-                        distance(
-                            ordered[0],
-                            ordered[3]
-                        )
-                        +
-                        distance(
-                            ordered[1],
-                            ordered[2]
-                        )
-                    ) / 2;
-
-
-                if(
-                    width > 30 &&
-                    height > 30
-                ){
-
-                    const ratio =
-                        Math.max(
-                            width,
-                            height
-                        ) /
-                        Math.min(
-                            width,
-                            height
-                        );
-
-
-                    if(
-                        ratio >= 1.20 &&
-                        ratio <= 2.50
-                    ){
-
-                        /*
-                        Strong preference for
-                        Aadhaar/card-like geometry.
-                        */
-
-                        const ratioPenalty =
-                            Math.abs(
-                                ratio -
-                                1.586
-                            );
-
-
-                        let score =
-                            areaRatio *
-                            100;
-
-
-                        score +=
-                            Math.max(
-                                0,
-                                40 -
-                                ratioPenalty *
-                                25
-                            );
-
-
-                        /*
-                        Reward candidates that
-                        aren't tiny.
-                        */
-
-                        if(
-                            areaRatio >
-                            0.08
-                        ){
-
-                            score += 15;
-
-                        }
-
-
-                        if(
-                            areaRatio >
-                            0.15
-                        ){
-
-                            score += 15;
-
-                        }
-
-
-                        candidates.push({
-
-                            score:score,
-
-                            points:ordered
-
-                        });
-
-                    }
-
-                }
-
-            }
-
-
-            approx.delete();
-
-            contour.delete();
-
-        }
-
-
-        if(
-            !candidates.length
-        ){
-
-            return null;
-        }
-
-
-        candidates.sort(
-            (a,b) =>
-                b.score -
-                a.score
-        );
-
-
-        const best =
-            candidates[0];
-
-
-        const scaleX =
-            canvas.width /
-            src.cols;
-
-
-        const scaleY =
-            canvas.height /
-            src.rows;
-
-
-        return best.points.map(
-            p => ({
-
-                x:
-                    p.x *
-                    scaleX,
-
-                y:
-                    p.y *
-                    scaleY
-
-            })
-        );
-
-    }
-    catch(error){
-
-        console.error(
-            "Detection error:",
-            error
-        );
-
-
-        return null;
-
-    }
-    finally{
-
-        if(src) src.delete();
-        if(gray) gray.delete();
-        if(blur) blur.delete();
-        if(edges) edges.delete();
-        if(contours) contours.delete();
-        if(hierarchy) hierarchy.delete();
-        if(kernel) kernel.delete();
-
-    }
-}
-
-
-/* ============================================================
-   PERSPECTIVE CROP
-   ============================================================ */
-
-function perspectiveCrop(
-    canvas,
-    points
-){
-
-    let src = null;
-    let dst = null;
-    let matrix = null;
-    let srcPoints = null;
-    let dstPoints = null;
-
-
-    try{
-
-        const ordered =
-            orderPoints(
-                points
-            );
-
-
-        const tl =
-            ordered[0];
-
-        const tr =
-            ordered[1];
-
-        const br =
-            ordered[2];
-
-        const bl =
-            ordered[3];
-
-
-        const width =
-            Math.round(
-                Math.max(
-                    distance(tl,tr),
-                    distance(bl,br)
-                )
-            );
-
-
-        const height =
-            Math.round(
-                Math.max(
-                    distance(tl,bl),
-                    distance(tr,br)
-                )
-            );
-
-
-        /*
-        Keep plenty of resolution.
-        */
-
-        const maxSize =
-            3000;
-
-
-        let outWidth =
-            width;
-
-
-        let outHeight =
-            height;
-
-
-        const largest =
-            Math.max(
-                outWidth,
-                outHeight
-            );
-
-
-        if(
-            largest >
-            maxSize
-        ){
-
-            const scale =
-                maxSize /
-                largest;
-
-
-            outWidth =
-                Math.round(
-                    outWidth *
-                    scale
-                );
-
-
-            outHeight =
-                Math.round(
-                    outHeight *
-                    scale
-                );
-
-        }
-
-
-        src =
-            cv.imread(
-                canvas
-            );
-
-
-        srcPoints =
-            cv.matFromArray(
-                4,
-                1,
-                cv.CV_32FC2,
-                [
-
-                    tl.x,
-                    tl.y,
-
-                    tr.x,
-                    tr.y,
-
-                    br.x,
-                    br.y,
-
-                    bl.x,
-                    bl.y
-
-                ]
-            );
-
-
-        dstPoints =
-            cv.matFromArray(
-                4,
-                1,
-                cv.CV_32FC2,
-                [
-
-                    0,
-                    0,
-
-                    outWidth,
-                    0,
-
-                    outWidth,
-                    outHeight,
-
-                    0,
-                    outHeight
-
-                ]
-            );
-
-
-        matrix =
-            cv.getPerspectiveTransform(
-                srcPoints,
-                dstPoints
-            );
-
-
-        dst =
-            new cv.Mat();
-
-
-        cv.warpPerspective(
-            src,
-            dst,
-            matrix,
-            new cv.Size(
-                outWidth,
-                outHeight
-            ),
-            cv.INTER_CUBIC,
-            cv.BORDER_REPLICATE
-        );
-
-
-        const output =
-            document.createElement(
-                "canvas"
-            );
-
-
-        output.width =
-            outWidth;
-
-
-        output.height =
-            outHeight;
-
-
-        cv.imshow(
-            output,
-            dst
-        );
-
-
-        /*
-        Normalize 90°/270° using
-        physical card geometry.
-
-        Aadhaar is landscape.
-        */
-
-        if(
-            output.height >
-            output.width
-        ){
-
-            return rotate90(
-                output
-            );
-        }
-
-
-        return output;
-
-    }
-    finally{
-
-        if(src) src.delete();
-        if(dst) dst.delete();
-        if(matrix) matrix.delete();
-        if(srcPoints) srcPoints.delete();
-        if(dstPoints) dstPoints.delete();
-
-    }
-}
-
-
-/* ============================================================
-   OCR ORIENTATION
-   ============================================================ */
-
-/*
-   IMPORTANT:
-
-   We crop first.
-
-   Then we test 0°, 90°, 180°, 270°.
-
-   Tesseract receives a small working copy,
-   while the selected rotation is applied
-   to the full-resolution crop.
-
-   This keeps quality high.
-*/
-
-async function scoreOrientation(
-    canvas
-){
-
-    const Tesseract =
-        await loadTesseract();
-
-
-    const worker =
-        await Tesseract.createWorker(
-            "eng"
-        );
-
-
-    try{
-
-        const result =
-            await worker.recognize(
-                canvas,
-                {
-                    rotateAuto:true
-                }
-            );
-
-
-        const confidence =
-            result &&
-            result.data &&
-            typeof result.data.confidence ===
-                "number"
-            ? result.data.confidence
-            : 0;
-
-
-        const text =
-            result &&
-            result.data &&
-            result.data.text
-            ? result.data.text
-            : "";
-
-
-        /*
-        Confidence + amount of usable text.
-        */
-
-        const usefulCharacters =
-            text
-                .replace(
-                    /[^A-Za-z0-9]/g,
-                    ""
-                )
-                .length;
-
-
-        const score =
-            confidence +
-            Math.min(
-                usefulCharacters,
-                80
-            ) * 0.35;
-
-
-        return {
-            score:score,
-            confidence:confidence,
-            text:text
-        };
-
-    }
-    finally{
-
-        await worker.terminate();
-
-    }
-}
-
-
-/*
-   We don't actually need OCR to run on all four
-   huge images.
-
-   First make a smaller analysis copy.
-*/
-
-function makeAnalysisCanvas(
-    canvas
-){
-
-    const maxWidth =
-        1200;
-
-
-    const scale =
-        Math.min(
-            1,
-            maxWidth /
-            canvas.width
-        );
-
-
-    const output =
-        document.createElement(
-            "canvas"
-        );
-
-
-    output.width =
-        Math.round(
-            canvas.width *
-            scale
-        );
-
-
-    output.height =
-        Math.round(
-            canvas.height *
-            scale
-        );
-
-
-    const ctx =
-        output.getContext(
-            "2d"
-        );
-
-
-    ctx.drawImage(
-        canvas,
-        0,
-        0,
-        output.width,
-        output.height
+  const differences =
+    points.map(
+      p=>p.x-p.y
     );
 
 
-    return output;
+  return [
+
+    points[
+      sums.indexOf(
+        Math.min(...sums)
+      )
+    ],
+
+    points[
+      differences.indexOf(
+        Math.max(...differences)
+      )
+    ],
+
+    points[
+      sums.indexOf(
+        Math.max(...sums)
+      )
+    ],
+
+    points[
+      differences.indexOf(
+        Math.min(...differences)
+      )
+    ]
+
+  ];
+
 }
 
 
-/*
-   OCR engine's rotateAuto result is used as a
-   signal, but we explicitly test orientations.
-
-   This prevents us from relying on a single
-   orientation guess.
-*/
-
-async function chooseOrientation(
-    canvas
-){
-
-    const orientations = [
-
-        {
-            degrees:0,
-            image:canvas
-        },
-
-        {
-            degrees:90,
-            image:rotate90(canvas)
-        },
-
-        {
-            degrees:180,
-            image:rotate180(canvas)
-        },
-
-        {
-            degrees:270,
-            image:rotate270(canvas)
-        }
-
-    ];
+/* ============================================================
+   DOCUMENT DETECTION
+   ============================================================ */
 
 
-    const results = [];
+async function detect(canvas){
+
+  const cv = await getCV();
+
+
+  const scale =
+    Math.min(
+      1,
+      MAX_DETECT /
+      Math.max(
+        canvas.width,
+        canvas.height
+      )
+    );
+
+
+  const width =
+    Math.round(
+      canvas.width * scale
+    );
+
+
+  const height =
+    Math.round(
+      canvas.height * scale
+    );
+
+
+  const work =
+    document.createElement("canvas");
+
+
+  work.width = width;
+
+  work.height = height;
+
+
+  work
+    .getContext("2d")
+    .drawImage(
+      canvas,
+      0,
+      0,
+      width,
+      height
+    );
+
+
+  const source =
+    cv.imread(work);
+
+  const gray =
+    new cv.Mat();
+
+  const blur =
+    new cv.Mat();
+
+  const edges =
+    new cv.Mat();
+
+  const closed =
+    new cv.Mat();
+
+  const kernel =
+    cv.Mat.ones(
+      5,
+      5,
+      cv.CV_8U
+    );
+
+  const contours =
+    new cv.MatVector();
+
+  const hierarchy =
+    new cv.Mat();
+
+
+  const candidates = [];
+
+
+  try{
+
+    cv.cvtColor(
+      source,
+      gray,
+      cv.COLOR_RGBA2GRAY
+    );
+
+
+    cv.GaussianBlur(
+      gray,
+      blur,
+      new cv.Size(5,5),
+      0
+    );
+
+
+    cv.Canny(
+      blur,
+      edges,
+      18,
+      95
+    );
+
+
+    cv.morphologyEx(
+      edges,
+      closed,
+      cv.MORPH_CLOSE,
+      kernel
+    );
+
+
+    cv.findContours(
+      closed,
+      contours,
+      hierarchy,
+      cv.RETR_LIST,
+      cv.CHAIN_APPROX_SIMPLE
+    );
+
+
+    const imageArea =
+      width * height;
 
 
     for(
-        const item of orientations
+      let i=0;
+      i<contours.size();
+      i++
     ){
 
-        const analysis =
-            makeAnalysisCanvas(
-                item.image
+      const contour =
+        contours.get(i);
+
+
+      const area =
+        cv.contourArea(contour);
+
+
+      const areaRatio =
+        area / imageArea;
+
+
+      if(
+        areaRatio < 0.015 ||
+        areaRatio > 0.94
+      ){
+
+        contour.delete();
+
+        continue;
+
+      }
+
+
+      const perimeter =
+        cv.arcLength(
+          contour,
+          true
+        );
+
+
+      for(
+        const epsilonFactor
+        of [.015,.02,.028]
+      ){
+
+        const approximation =
+          new cv.Mat();
+
+
+        cv.approxPolyDP(
+          contour,
+          approximation,
+          epsilonFactor * perimeter,
+          true
+        );
+
+
+        if(
+          approximation.rows === 4 &&
+          cv.isContourConvex(
+            approximation
+          )
+        ){
+
+          const points = [];
+
+
+          for(
+            let j=0;
+            j<4;
+            j++
+          ){
+
+            const point =
+              approximation.intPtr(
+                j,
+                0
+              );
+
+
+            points.push({
+              x:point[0],
+              y:point[1]
+            });
+
+          }
+
+
+          const ordered =
+            order(points);
+
+
+          const widthTop =
+            distance(
+              ordered[0],
+              ordered[1]
             );
 
 
-        const result =
-            await scoreOrientation(
-                analysis
+          const widthBottom =
+            distance(
+              ordered[3],
+              ordered[2]
             );
 
 
-        results.push({
+          const heightLeft =
+            distance(
+              ordered[0],
+              ordered[3]
+            );
 
-            degrees:
-                item.degrees,
 
-            score:
-                result.score,
+          const heightRight =
+            distance(
+              ordered[1],
+              ordered[2]
+            );
 
-            confidence:
-                result.confidence,
 
-            text:
-                result.text
+          const averageWidth =
+            (
+              widthTop +
+              widthBottom
+            ) / 2;
 
-        });
+
+          const averageHeight =
+            (
+              heightLeft +
+              heightRight
+            ) / 2;
+
+
+          const ratio =
+            Math.max(
+              averageWidth,
+              averageHeight
+            ) /
+            Math.max(
+              1,
+              Math.min(
+                averageWidth,
+                averageHeight
+              )
+            );
+
+
+          /*
+             Aadhaar/card-like documents
+             are generally wider than tall.
+          */
+
+          if(
+            ratio >= 1.15 &&
+            ratio <= 2.7
+          ){
+
+            const targetRatio =
+              85 / 55;
+
+
+            const ratioPenalty =
+              Math.abs(
+                ratio -
+                targetRatio
+              );
+
+
+            const score =
+              areaRatio * 120 +
+              Math.max(
+                0,
+                30 -
+                ratioPenalty * 20
+              );
+
+
+            candidates.push({
+              points,
+              score,
+              areaRatio,
+              ratio
+            });
+
+          }
+
+        }
+
+
+        approximation.delete();
+
+      }
+
+
+      contour.delete();
 
     }
 
 
-    results.sort(
-        (a,b) =>
-            b.score -
-            a.score
+    if(!candidates.length){
+
+      return null;
+
+    }
+
+
+    candidates.sort(
+      (a,b)=>b.score-a.score
     );
 
 
     const best =
-        results[0];
+      candidates[0];
 
 
-    const second =
-        results[1];
+    return best.points.map(
+      point=>({
+        x:point.x/scale,
+        y:point.y/scale
+      })
+    );
+
+
+  }finally{
+
+    source.delete();
+    gray.delete();
+    blur.delete();
+    edges.delete();
+    closed.delete();
+    kernel.delete();
+    contours.delete();
+    hierarchy.delete();
+
+  }
+
+}
+
+
+/* ============================================================
+   PERSPECTIVE CORRECTION
+   ============================================================ */
+
+
+async function crop(canvas,points){
+
+  const cv = await getCV();
+
+  const p = order(points);
+
+
+  const topWidth =
+    Math.max(
+      distance(p[0],p[1]),
+      distance(p[3],p[2])
+    );
+
+
+  const sideHeight =
+    Math.max(
+      distance(p[0],p[3]),
+      distance(p[1],p[2])
+    );
+
+
+  let width =
+    Math.min(
+      MAX_OUTPUT,
+      Math.max(
+        1000,
+        Math.round(topWidth)
+      )
+    );
+
+
+  let height =
+    Math.min(
+      MAX_OUTPUT,
+      Math.max(
+        650,
+        Math.round(sideHeight)
+      )
+    );
+
+
+  /*
+     Destination is always landscape.
+  */
+
+  if(height > width){
+
+    const temporary =
+      width;
+
+    width =
+      height;
+
+    height =
+      temporary;
+
+  }
+
+
+  const sourcePoints =
+    cv.matFromArray(
+      4,
+      1,
+      cv.CV_32FC2,
+      [
+
+        p[0].x,
+        p[0].y,
+
+        p[1].x,
+        p[1].y,
+
+        p[2].x,
+        p[2].y,
+
+        p[3].x,
+        p[3].y
+
+      ]
+    );
+
+
+  const destinationPoints =
+    cv.matFromArray(
+      4,
+      1,
+      cv.CV_32FC2,
+      [
+
+        0,
+        0,
+
+        width-1,
+        0,
+
+        width-1,
+        height-1,
+
+        0,
+        height-1
+
+      ]
+    );
+
+
+  const transform =
+    cv.getPerspectiveTransform(
+      sourcePoints,
+      destinationPoints
+    );
+
+
+  const input =
+    cv.imread(canvas);
+
+
+  const output =
+    new cv.Mat();
+
+
+  try{
+
+    cv.warpPerspective(
+      input,
+      output,
+      transform,
+      new cv.Size(
+        width,
+        height
+      ),
+      cv.INTER_CUBIC,
+      cv.BORDER_REPLICATE
+    );
+
+
+    const result =
+      document.createElement("canvas");
+
+
+    result.width =
+      width;
+
+    result.height =
+      height;
+
+
+    cv.imshow(
+      result,
+      output
+    );
+
+
+    return result;
+
+
+  }finally{
+
+    sourcePoints.delete();
+    destinationPoints.delete();
+    transform.delete();
+    input.delete();
+    output.delete();
+
+  }
+
+}
+
+
+/* ============================================================
+   ORIENTATION
+   ============================================================
+
+   We deliberately DO NOT use OCR.
+
+   The previous OCR approach could take a correctly oriented
+   iPhone image and rotate it incorrectly.
+
+   Geometry can safely identify sideways cards:
+
+       portrait canvas = rotate 90°
+
+   But geometry cannot mathematically distinguish:
+       upright vs upside-down.
+
+   Therefore 180° is left to the user with the button.
+   ============================================================ */
+
+
+function rotate(canvas,degrees){
+
+  degrees =
+    ((degrees % 360) + 360) % 360;
+
+
+  if(degrees === 0){
+
+    return copy(canvas);
+
+  }
+
+
+  const swap =
+    degrees === 90 ||
+    degrees === 270;
+
+
+  const result =
+    document.createElement("canvas");
+
+
+  result.width =
+    swap
+      ? canvas.height
+      : canvas.width;
+
+
+  result.height =
+    swap
+      ? canvas.width
+      : canvas.height;
+
+
+  const context =
+    result.getContext(
+      "2d",
+      {alpha:false}
+    );
+
+
+  context.imageSmoothingEnabled = true;
+
+  context.imageSmoothingQuality = "high";
+
+
+  context.translate(
+    result.width/2,
+    result.height/2
+  );
+
+
+  context.rotate(
+    degrees *
+    Math.PI /
+    180
+  );
+
+
+  context.drawImage(
+    canvas,
+    -canvas.width/2,
+    -canvas.height/2
+  );
+
+
+  return result;
+
+}
+
+
+function landscape(canvas){
+
+  if(
+    canvas.width >=
+    canvas.height
+  ){
+
+    return copy(canvas);
+
+  }
+
+
+  return rotate(
+    canvas,
+    90
+  );
+
+}
+
+
+/* ============================================================
+   FILE PROCESSING
+   ============================================================ */
+
+
+async function handleFile(file,side){
+
+  if(!file){
+
+    return;
+
+  }
+
+
+  if(
+    !file.type ||
+    !file.type.startsWith("image/")
+  ){
+
+    status(
+      side,
+      "Please select an image file.",
+      true
+    );
+
+    return;
+
+  }
+
+
+  /*
+     MOST IMPORTANT PART:
+
+     Show the user's selected image immediately.
+
+     Even if OpenCV fails later,
+     the image remains visible.
+  */
+
+  const preview =
+    $(side+"Preview");
+
+
+  const immediateURL =
+    URL.createObjectURL(file);
+
+
+  preview.src =
+    immediateURL;
+
+
+  preview.classList.remove(
+    "hidden"
+  );
+
+
+  $(side+"Actions")
+    .classList.remove(
+      "hidden"
+    );
+
+
+  status(
+    side,
+    "Photo selected. Preparing document…"
+  );
+
+
+  loading(
+    "Reading photo…"
+  );
+
+
+  try{
+
+    const decoded =
+      await decodeFile(file);
+
+
+    const original =
+      sourceCanvas(
+        decoded.source
+      );
 
 
     /*
-    Only trust orientation if there is
-    a meaningful difference.
-
-    Otherwise don't randomly rotate.
+       Keep EXIF-corrected image.
     */
 
-    const difference =
-        best.score -
-        second.score;
+    preview.src =
+      original.toDataURL(
+        "image/jpeg",
+        .95
+      );
 
 
-    const confident =
-        best.confidence >= 35 &&
-        difference >= 8;
-
-
-    return {
-
-        degrees:
-            confident
-            ? best.degrees
-            : 0,
-
-        confident:
-            confident,
-
-        confidence:
-            best.confidence,
-
-        results:
-            results
-
-    };
-}
-
-
-/* ============================================================
-   APPLY ORIENTATION
-   ============================================================ */
-
-function applyOrientation(
-    canvas,
-    degrees
-){
-
-    if(
-        degrees === 90
-    ){
-
-        return rotate90(
-            canvas
-        );
-    }
-
-
-    if(
-        degrees === 180
-    ){
-
-        return rotate180(
-            canvas
-        );
-    }
-
-
-    if(
-        degrees === 270
-    ){
-
-        return rotate270(
-            canvas
-        );
-    }
-
-
-    return canvas;
-}
-
-
-/* ============================================================
-   PROCESS UPLOAD
-   ============================================================ */
-
-async function processUpload(
-    side,
-    file
-){
-
-    showLoading(
-        "Reading photo…"
+    loading(
+      "Detecting document…"
     );
+
+
+    let points = null;
 
 
     try{
 
-        const image =
-            await loadImageFromFile(
-                file
-            );
-
-
-        const original =
-            imageToCanvas(
-                image
-            );
-
-
-        if(
-            side === "front"
-        ){
-
-            frontOriginal =
-                original;
-
-        }
-        else{
-
-            backOriginal =
-                original;
-
-        }
-
-
-        /*
-        Show something immediately.
-        */
-
-        updatePreview(
-            side,
-            original
+      points =
+        await detect(
+          original
         );
 
-
-        setStatus(
-            side,
-            "Photo loaded."
-        );
-
-
-        showLoading(
-            "Starting document scanner…"
-        );
-
-
-        try{
-
-            await loadOpenCV();
-
-        }
-        catch(error){
-
-            console.error(
-                error
-            );
-
-
-            if(
-                side === "front"
-            ){
-
-                frontDocument =
-                    original;
-
-            }
-            else{
-
-                backDocument =
-                    original;
-
-            }
-
-
-            setStatus(
-                side,
-                "Scanner unavailable. Use Adjust corners."
-            );
-
-
-            return;
-        }
-
-
-        showLoading(
-            "Finding Aadhaar card…"
-        );
-
-
-        const points =
-            detectDocument(
-                original
-            );
-
-
-        if(!points){
-
-            if(
-                side === "front"
-            ){
-
-                frontDocument =
-                    original;
-
-            }
-            else{
-
-                backDocument =
-                    original;
-
-            }
-
-
-            setStatus(
-                side,
-                "Card not detected automatically. Use Adjust corners."
-            );
-
-
-            return;
-        }
-
-
-        showLoading(
-            "Cropping and straightening…"
-        );
-
-
-        let cropped =
-            perspectiveCrop(
-                original,
-                points
-            );
-
-
-        /*
-        OCR only starts AFTER successful crop.
-        */
-
-        showLoading(
-            "Checking orientation…"
-        );
-
-
-        try{
-
-            const orientation =
-                await chooseOrientation(
-                    cropped
-                );
-
-
-            if(
-                orientation.confident
-            ){
-
-                cropped =
-                    applyOrientation(
-                        cropped,
-                        orientation.degrees
-                    );
-
-
-                setStatus(
-                    side,
-                    "Card detected and oriented automatically."
-                );
-
-            }
-            else{
-
-                setStatus(
-                    side,
-                    "Card detected and straightened."
-                );
-
-            }
-
-        }
-        catch(error){
-
-            console.warn(
-                "Orientation check unavailable:",
-                error
-            );
-
-
-            setStatus(
-                side,
-                "Card detected and straightened."
-            );
-
-        }
-
-
-        /*
-        Final geometry normalization.
-
-        Aadhaar card itself is landscape.
-        */
-
-        if(
-            cropped.height >
-            cropped.width
-        ){
-
-            cropped =
-                rotate90(
-                    cropped
-                );
-        }
-
-
-        if(
-            side === "front"
-        ){
-
-            frontDocument =
-                cropped;
-
-        }
-        else{
-
-            backDocument =
-                cropped;
-
-        }
-
-
-        updatePreview(
-            side,
-            cropped
-        );
+    }catch(error){
+
+      console.warn(
+        "Automatic detection failed:",
+        error
+      );
 
     }
-    catch(error){
 
-        console.error(
-            "PrintReady error:",
-            error
+
+    /*
+       If detection fails,
+       DO NOT throw away the image.
+    */
+
+    if(!points){
+
+      S[side] = {
+
+        canvas:
+          landscape(original),
+
+        original:
+          original,
+
+        points:
+          null,
+
+        detected:
+          false
+
+      };
+
+
+      preview.src =
+        S[side].canvas.toDataURL(
+          "image/jpeg",
+          .96
         );
 
 
-        setStatus(
-            side,
-            "Could not process this photo."
+      status(
+        side,
+        "Card edges were not detected automatically. The photo is kept — use “Adjust corners”.",
+        true
+      );
+
+
+      updatePDFButton();
+
+      done();
+
+      return;
+
+    }
+
+
+    loading(
+      "Straightening document…"
+    );
+
+
+    const straight =
+      await crop(
+        original,
+        points
+      );
+
+
+    /*
+       Automatically correct only sideways orientation.
+    */
+
+    const finalCanvas =
+      landscape(
+        straight
+      );
+
+
+    S[side] = {
+
+      canvas:
+        finalCanvas,
+
+      original:
+        original,
+
+      points:
+        points,
+
+      detected:
+        true
+
+    };
+
+
+    preview.src =
+      finalCanvas.toDataURL(
+        "image/jpeg",
+        .96
+      );
+
+
+    status(
+      side,
+      "Document detected, straightened and oriented."
+    );
+
+
+    updatePDFButton();
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+
+    /*
+       Never blank the preview.
+    */
+
+    status(
+      side,
+      "The photo was selected, but automatic processing failed. Use “Adjust corners”.",
+      true
+    );
+
+
+    if(!S[side]){
+
+      S[side] = {
+
+        canvas:null,
+
+        original:null,
+
+        points:null,
+
+        detected:false
+
+      };
+
+    }
+
+
+    updatePDFButton();
+
+
+  }finally{
+
+    done();
+
+
+    setTimeout(
+      ()=>{
+        URL.revokeObjectURL(
+          immediateURL
         );
+      },
+      5000
+    );
 
-    }
-    finally{
+  }
 
-        hideLoading();
-
-    }
 }
 
 
 /* ============================================================
-   FILE INPUTS
+   MANUAL CORNER EDITOR
    ============================================================ */
 
-document
-    .getElementById(
-        "frontInput"
-    )
-    .addEventListener(
-        "change",
-        function(){
 
-            if(
-                this.files &&
-                this.files.length
-            ){
+function openManual(side){
 
-                processUpload(
-                    "front",
-                    this.files[0]
-                );
+  const item =
+    S[side];
 
-            }
 
-        }
+  if(
+    !item ||
+    !item.original
+  ){
+
+    return;
+
+  }
+
+
+  const wrap =
+    $(side+"EditorWrap");
+
+
+  const editor =
+    $(side+"Editor");
+
+
+  const canvas =
+    $(side+"EditorCanvas");
+
+
+  wrap.classList.remove(
+    "hidden"
+  );
+
+
+  const source =
+    item.original;
+
+
+  const scale =
+    Math.min(
+      1,
+      1100 /
+      Math.max(
+        source.width,
+        source.height
+      )
     );
 
 
-document
-    .getElementById(
-        "backInput"
+  canvas.width =
+    Math.round(
+      source.width *
+      scale
+    );
+
+
+  canvas.height =
+    Math.round(
+      source.height *
+      scale
+    );
+
+
+  canvas
+    .getContext("2d")
+    .drawImage(
+      source,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+  editor
+    .querySelectorAll(
+      ".corner"
     )
-    .addEventListener(
-        "change",
-        function(){
+    .forEach(
+      element=>element.remove()
+    );
 
-            if(
-                this.files &&
-                this.files.length
-            ){
 
-                processUpload(
-                    "back",
-                    this.files[0]
-                );
+  let points;
 
-            }
+
+  if(item.points){
+
+    points =
+      order(
+        item.points
+      ).map(
+        point=>({
+          x:
+            point.x *
+            scale,
+
+          y:
+            point.y *
+            scale
+        })
+      );
+
+  }else{
+
+    points = [
+
+      {
+        x:
+          canvas.width *
+          .06,
+
+        y:
+          canvas.height *
+          .08
+      },
+
+      {
+        x:
+          canvas.width *
+          .94,
+
+        y:
+          canvas.height *
+          .08
+      },
+
+      {
+        x:
+          canvas.width *
+          .94,
+
+        y:
+          canvas.height *
+          .92
+      },
+
+      {
+        x:
+          canvas.width *
+          .06,
+
+        y:
+          canvas.height *
+          .92
+      }
+
+    ];
+
+  }
+
+
+  S.manual = {
+
+    side:
+      side,
+
+    source:
+      source,
+
+    scale:
+      scale,
+
+    points:
+      points
+
+  };
+
+
+  points.forEach(
+    (point,index)=>{
+
+      const corner =
+        document.createElement(
+          "div"
+        );
+
+
+      corner.className =
+        "corner";
+
+
+      corner.dataset.index =
+        index;
+
+
+      corner.style.left =
+        point.x +
+        "px";
+
+
+      corner.style.top =
+        point.y +
+        "px";
+
+
+      editor.appendChild(
+        corner
+      );
+
+
+      let active =
+        false;
+
+
+      corner.addEventListener(
+        "pointerdown",
+        event=>{
+
+          event.preventDefault();
+
+          active = true;
+
+          corner.setPointerCapture?.(
+            event.pointerId
+          );
 
         }
+      );
+
+
+      corner.addEventListener(
+        "pointermove",
+        event=>{
+
+          if(!active){
+
+            return;
+
+          }
+
+
+          const rect =
+            editor.getBoundingClientRect();
+
+
+          const x =
+            Math.max(
+              0,
+              Math.min(
+                canvas.clientWidth,
+                event.clientX -
+                rect.left
+              )
+            );
+
+
+          const y =
+            Math.max(
+              0,
+              Math.min(
+                canvas.clientHeight,
+                event.clientY -
+                rect.top
+              )
+            );
+
+
+          corner.style.left =
+            x +
+            "px";
+
+
+          corner.style.top =
+            y +
+            "px";
+
+
+          const scaleX =
+            canvas.width /
+            canvas.clientWidth;
+
+
+          const scaleY =
+            canvas.height /
+            canvas.clientHeight;
+
+
+          S.manual.points[index] = {
+
+            x:
+              x *
+              scaleX,
+
+            y:
+              y *
+              scaleY
+
+          };
+
+        }
+      );
+
+
+      corner.addEventListener(
+        "pointerup",
+        ()=>{
+          active=false;
+        }
+      );
+
+
+      corner.addEventListener(
+        "pointercancel",
+        ()=>{
+          active=false;
+        }
+      );
+
+    }
+  );
+
+}
+
+
+async function applyManual(side){
+
+  if(
+    !S.manual ||
+    S.manual.side !== side
+  ){
+
+    return;
+
+  }
+
+
+  loading(
+    "Applying crop…"
+  );
+
+
+  try{
+
+    const points =
+      S.manual.points.map(
+        point=>({
+
+          x:
+            point.x /
+            S.manual.scale,
+
+          y:
+            point.y /
+            S.manual.scale
+
+        })
+      );
+
+
+    const result =
+      await crop(
+        S.manual.source,
+        points
+      );
+
+
+    const finalCanvas =
+      landscape(
+        result
+      );
+
+
+    S[side] = {
+
+      canvas:
+        finalCanvas,
+
+      original:
+        S.manual.source,
+
+      points:
+        points,
+
+      detected:
+        true
+
+    };
+
+
+    $(side+"Preview").src =
+      finalCanvas.toDataURL(
+        "image/jpeg",
+        .96
+      );
+
+
+    status(
+      side,
+      "Manual crop applied."
     );
+
+
+    $(side+"EditorWrap")
+      .classList.add(
+        "hidden"
+      );
+
+
+    S.manual = null;
+
+
+    updatePDFButton();
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+
+    status(
+      side,
+      "Could not apply manual crop.",
+      true
+    );
+
+  }finally{
+
+    done();
+
+  }
+
+}
 
 
 /* ============================================================
    MANUAL ROTATION
    ============================================================ */
 
-function rotateDocument(side){
 
-    if(
-        side === "front"
-    ){
+function rotateSide(
+  side,
+  degrees
+){
 
-        if(!frontDocument)
-            return;
+  if(
+    !S[side] ||
+    !S[side].canvas
+  ){
 
+    return;
 
-        frontDocument =
-            rotate90(
-                frontDocument
-            );
-
-
-        updatePreview(
-            "front",
-            frontDocument
-        );
+  }
 
 
-        setStatus(
-            "front",
-            "Rotated 90°."
-        );
-
-    }
-    else{
-
-        if(!backDocument)
-            return;
+  S[side].canvas =
+    rotate(
+      S[side].canvas,
+      degrees
+    );
 
 
-        backDocument =
-            rotate90(
-                backDocument
-            );
+  $(side+"Preview").src =
+    S[side].canvas.toDataURL(
+      "image/jpeg",
+      .96
+    );
 
 
-        updatePreview(
-            "back",
-            backDocument
-        );
+  status(
+    side,
+    "Rotation applied."
+  );
 
-
-        setStatus(
-            "back",
-            "Rotated 90°."
-        );
-
-    }
 }
 
 
 /* ============================================================
-   MANUAL EDITOR
+   A4 PDF
    ============================================================ */
 
-function openManualEditor(side){
 
-    const original =
-        side === "front"
-        ? frontOriginal
-        : backOriginal;
+async function createPDF(){
 
+  if(
+    !S.front ||
+    !S.front.canvas
+  ){
 
-    if(!original)
-        return;
+    return;
 
-
-    const editor =
-        document.getElementById(
-            side + "Editor"
-        );
+  }
 
 
-    editor.classList.remove(
-        "hidden"
-    );
+  loading(
+    "Creating A4 PDF…"
+  );
 
 
-    const canvas =
-        document.getElementById(
-            side + "Canvas"
-        );
+  try{
+
+    const jsPDF =
+      await getPDF();
 
 
-    const width =
-        editor.clientWidth ||
-        580;
+    const pdf =
+      new jsPDF({
+
+        orientation:
+          "portrait",
+
+        unit:
+          "mm",
+
+        format:
+          "a4",
+
+        compress:
+          true
+
+      });
 
 
-    const scale =
-        Math.min(
-            1,
-            width /
-            original.width
-        );
+    const pageWidth =
+      210;
 
 
-    canvas.width =
-        Math.round(
-            original.width *
-            scale
-        );
+    const pageHeight =
+      297;
 
 
-    canvas.height =
-        Math.round(
-            original.height *
-            scale
-        );
+    const margin =
+      18;
 
 
-    canvas
-        .getContext("2d")
-        .drawImage(
-            original,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+    const gap =
+      18;
 
 
-    const mx =
-        canvas.width *
-        0.08;
+    const documents = [
 
-
-    const my =
-        canvas.height *
-        0.12;
-
-
-    const points = [
-
-        {
-            x:mx,
-            y:my
-        },
-
-        {
-            x:
-                canvas.width - mx,
-            y:my
-        },
-
-        {
-            x:
-                canvas.width - mx,
-            y:
-                canvas.height - my
-        },
-
-        {
-            x:mx,
-            y:
-                canvas.height - my
-        }
+      S.front.canvas
 
     ];
 
 
-    points.forEach(
-        function(point,index){
-
-            const corner =
-                document.getElementById(
-                    side +
-                    "Corner" +
-                    (index + 1)
-                );
-
-
-            corner.style.left =
-                point.x + "px";
-
-
-            corner.style.top =
-                point.y + "px";
-
-
-            attachCornerDrag(
-                corner,
-                canvas
-            );
-
-        }
-    );
-}
-
-
-function attachCornerDrag(
-    element,
-    canvas
-){
-
     if(
-        element.dataset.ready ===
-        "yes"
+      S.back &&
+      S.back.canvas
     ){
 
-        return;
+      documents.push(
+        S.back.canvas
+      );
+
     }
 
 
-    element.dataset.ready =
-        "yes";
+    const maxWidth =
+      pageWidth -
+      margin * 2;
 
 
-    let dragging =
-        false;
+    const availableHeight =
+      pageHeight -
+      40 -
+      gap *
+      (documents.length - 1);
 
 
-    element.addEventListener(
-        "pointerdown",
-        function(event){
-
-            dragging =
-                true;
+    const maxHeight =
+      availableHeight /
+      documents.length;
 
 
-            element.setPointerCapture(
-                event.pointerId
-            );
-
-
-            event.preventDefault();
-
-        }
-    );
-
-
-    element.addEventListener(
-        "pointermove",
-        function(event){
-
-            if(!dragging)
-                return;
-
-
-            const rect =
-                canvas.getBoundingClientRect();
-
-
-            let x =
-                event.clientX -
-                rect.left;
-
-
-            let y =
-                event.clientY -
-                rect.top;
-
-
-            x =
-                Math.max(
-                    0,
-                    Math.min(
-                        canvas.width,
-                        x
-                    )
-                );
-
-
-            y =
-                Math.max(
-                    0,
-                    Math.min(
-                        canvas.height,
-                        y
-                    )
-                );
-
-
-            element.style.left =
-                x + "px";
-
-
-            element.style.top =
-                y + "px";
-
-        }
-    );
-
-
-    element.addEventListener(
-        "pointerup",
-        function(){
-
-            dragging =
-                false;
-
-        }
-    );
-
-
-    element.addEventListener(
-        "pointercancel",
-        function(){
-
-            dragging =
-                false;
-
-        }
-    );
-}
-
-
-/* ============================================================
-   MANUAL CROP
-   ============================================================ */
-
-async function applyManualCrop(side){
-
-    const original =
-        side === "front"
-        ? frontOriginal
-        : backOriginal;
-
-
-    if(!original)
-        return;
-
-
-    const canvas =
-        document.getElementById(
-            side + "Canvas"
-        );
-
-
-    const points = [];
+    let y =
+      20;
 
 
     for(
-        let i=1;
-        i<=4;
-        i++
+      const canvas
+      of documents
     ){
 
-        const corner =
-            document.getElementById(
-                side +
-                "Corner" +
-                i
-            );
-
-
-        points.push({
-
-            x:
-                parseFloat(
-                    corner.style.left
-                ),
-
-            y:
-                parseFloat(
-                    corner.style.top
-                )
-
-        });
-
-    }
-
-
-    const sx =
-        original.width /
-        canvas.width;
-
-
-    const sy =
-        original.height /
-        canvas.height;
-
-
-    const realPoints =
-        points.map(
-            p => ({
-
-                x:
-                    p.x * sx,
-
-                y:
-                    p.y * sy
-
-            })
-        );
-
-
-    showLoading(
-        "Applying crop…"
-    );
-
-
-    try{
-
-        await loadOpenCV();
-
-
-        let cropped =
-            perspectiveCrop(
-                original,
-                realPoints
-            );
-
-
-        showLoading(
-            "Checking orientation…"
-        );
-
-
-        try{
-
-            const orientation =
-                await chooseOrientation(
-                    cropped
-                );
-
-
-            if(
-                orientation.confident
-            ){
-
-                cropped =
-                    applyOrientation(
-                        cropped,
-                        orientation.degrees
-                    );
-            }
-
-        }
-        catch(error){
-
-            console.warn(
-                error
-            );
-
-        }
-
-
-        if(
-            cropped.height >
-            cropped.width
-        ){
-
-            cropped =
-                rotate90(
-                    cropped
-                );
-        }
-
-
-        if(
-            side === "front"
-        ){
-
-            frontDocument =
-                cropped;
-
-        }
-        else{
-
-            backDocument =
-                cropped;
-
-        }
-
-
-        updatePreview(
-            side,
-            cropped
-        );
-
-
-        document
-            .getElementById(
-                side + "Editor"
-            )
-            .classList
-            .add("hidden");
-
-
-        setStatus(
-            side,
-            "Document cropped and straightened."
-        );
-
-    }
-    catch(error){
-
-        console.error(
-            error
-        );
-
-
-        setStatus(
-            side,
-            "Could not apply crop."
-        );
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-}
-
-
-/* ============================================================
-   PDF
-   ============================================================ */
-
-function addDocumentToA4(
-    pdf,
-    canvas,
-    x,
-    y,
-    maxWidth,
-    maxHeight
-){
-
-    const ratio =
+      const ratio =
         canvas.width /
         canvas.height;
 
 
-    let width =
+      let width =
         maxWidth;
 
 
-    let height =
+      let height =
         width /
         ratio;
 
 
-    if(
+      if(
         height >
         maxHeight
-    ){
+      ){
 
         height =
-            maxHeight;
-
+          maxHeight;
 
         width =
-            height *
-            ratio;
+          height *
+          ratio;
+
+      }
+
+
+      const x =
+        (
+          pageWidth -
+          width
+        ) / 2;
+
+
+      /*
+         PNG preserves the processed image without
+         introducing another JPEG compression step.
+      */
+
+      pdf.addImage(
+
+        canvas,
+
+        "PNG",
+
+        x,
+
+        y,
+
+        width,
+
+        height,
+
+        undefined,
+
+        "NONE",
+
+        0
+
+      );
+
+
+      y +=
+        height +
+        gap;
 
     }
 
 
-    const centeredX =
-        x +
-        (
-            maxWidth -
-            width
-        ) / 2;
-
-
-    /*
-    PNG is used instead of JPEG here.
-
-    This preserves text/detail better.
-    */
-
-    pdf.addImage(
-        canvas,
-        "PNG",
-        centeredX,
-        y,
-        width,
-        height,
-        undefined,
-        "FAST"
+    pdf.save(
+      "PrintReady-A4.pdf"
     );
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Could not create the PDF. Please try again."
+    );
+
+  }finally{
+
+    done();
+
+  }
+
 }
 
 
-document
-    .getElementById(
-        "createPdf"
-    )
-    .addEventListener(
-        "click",
-        async function(){
-
-            if(!frontDocument){
-
-                alert(
-                    "Please add the front-side photo first."
-                );
-
-                return;
-            }
+/* ============================================================
+   UI
+   ============================================================ */
 
 
-            showLoading(
-                "Loading PDF engine…"
-            );
+function updatePDFButton(){
 
-
-            try{
-
-                const jsPDF =
-                    await loadJsPDF();
-
-
-                showLoading(
-                    "Creating A4 PDF…"
-                );
-
-
-                const pdf =
-                    new jsPDF({
-
-                        orientation:
-                            "portrait",
-
-                        unit:
-                            "mm",
-
-                        format:
-                            "a4",
-
-                        compress:
-                            true
-
-                    });
-
-
-                const pageWidth =
-                    210;
-
-
-                const pageHeight =
-                    297;
-
-
-                const margin =
-                    10;
-
-
-                const usableWidth =
-                    pageWidth -
-                    margin * 2;
-
-
-                if(
-                    frontDocument &&
-                    backDocument
-                ){
-
-                    const gap =
-                        8;
-
-
-                    const slotHeight =
-                        (
-                            pageHeight -
-                            margin * 2 -
-                            gap
-                        ) / 2;
-
-
-                    addDocumentToA4(
-                        pdf,
-                        frontDocument,
-                        margin,
-                        margin,
-                        usableWidth,
-                        slotHeight
-                    );
-
-
-                    addDocumentToA4(
-                        pdf,
-                        backDocument,
-                        margin,
-                        margin +
-                        slotHeight +
-                        gap,
-                        usableWidth,
-                        slotHeight
-                    );
-
-                }
-                else{
-
-                    addDocumentToA4(
-                        pdf,
-                        frontDocument,
-                        margin,
-                        margin,
-                        usableWidth,
-                        pageHeight -
-                        margin * 2
-                    );
-
-                }
-
-
-                pdf.save(
-                    "PrintReady-A4.pdf"
-                );
-
-            }
-            catch(error){
-
-                console.error(
-                    "PDF error:",
-                    error
-                );
-
-
-                alert(
-                    "Could not create the PDF."
-                );
-
-            }
-            finally{
-
-                hideLoading();
-
-            }
-
-        }
+  $("pdfButton").disabled =
+    !(
+      S.front &&
+      S.front.canvas
     );
 
+}
 
-console.log(
-    "PrintReady ready."
-);
+
+/* Front upload */
+
+$("frontInput")
+  .addEventListener(
+    "change",
+    event=>{
+
+      handleFile(
+        event.target.files?.[0],
+        "front"
+      );
+
+    }
+  );
+
+
+/* Back upload */
+
+$("backInput")
+  .addEventListener(
+    "change",
+    event=>{
+
+      handleFile(
+        event.target.files?.[0],
+        "back"
+      );
+
+    }
+  );
+
+
+/* Rotation */
+
+$("front90")
+  .onclick =
+  ()=>rotateSide(
+    "front",
+    90
+  );
+
+
+$("front180")
+  .onclick =
+  ()=>rotateSide(
+    "front",
+    180
+  );
+
+
+$("back90")
+  .onclick =
+  ()=>rotateSide(
+    "back",
+    90
+  );
+
+
+$("back180")
+  .onclick =
+  ()=>rotateSide(
+    "back",
+    180
+  );
+
+
+/* Manual crop */
+
+$("frontManual")
+  .onclick =
+  ()=>openManual(
+    "front"
+  );
+
+
+$("backManual")
+  .onclick =
+  ()=>openManual(
+    "back"
+  );
+
+
+$("frontApply")
+  .onclick =
+  ()=>applyManual(
+    "front"
+  );
+
+
+$("backApply")
+  .onclick =
+  ()=>applyManual(
+    "back"
+  );
+
+
+$("frontCancel")
+  .onclick =
+  ()=>{
+
+    $("frontEditorWrap")
+      .classList.add(
+        "hidden"
+      );
+
+    S.manual =
+      null;
+
+  };
+
+
+$("backCancel")
+  .onclick =
+  ()=>{
+
+    $("backEditorWrap")
+      .classList.add(
+        "hidden"
+      );
+
+    S.manual =
+      null;
+
+  };
+
+
+/* PDF */
+
+$("pdfButton")
+  .onclick =
+  createPDF;
 
 </script>
 
